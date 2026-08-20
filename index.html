@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>夜明珠 · 戏楼诡影 · 最终版</title>
+    <title>夜明珠 · 戏楼诡影 · 最终统一版</title>
     <style>
         * {
             box-sizing: border-box;
@@ -39,7 +39,6 @@
             color: #f7d9c0;
             text-shadow: 0 0 12px #b3866a, 0 2px 0 #3f2820;
             margin-bottom: 2px;
-            font-family: '华文楷体', 'KaiTi', cursive;
         }
         .subhead {
             text-align: center;
@@ -104,6 +103,11 @@
             background: #2a4a3a;
             border-color: #5a8a6a;
             color: #b0e0c0;
+        }
+        .btn-red {
+            background: #4a2a2a;
+            border-color: #7a4a4a;
+            color: #f0c0c0;
         }
         .btn-blue {
             background: #2a3a4a;
@@ -328,7 +332,7 @@
             padding: 20px;
         }
         .modal-box {
-            max-width: 620px;
+            max-width: 640px;
             width: 100%;
             background: #1f1618;
             border: 1px solid #7a5a4a;
@@ -345,17 +349,12 @@
             margin-bottom: 10px;
             font-size: 1.1rem;
         }
-        .evidence-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 8px 0;
-        }
         .evidence-card {
             background: #0d080a;
             border: 1px solid #3a2a24;
             border-radius: 14px;
             padding: 12px 14px;
+            margin-bottom: 8px;
         }
         .evidence-card .ev-title {
             color: #dbb48c;
@@ -390,6 +389,16 @@
             background: #3a2a2a;
             border: 1px solid #6a4a4a;
             color: #e0c0c0;
+        }
+        .phase-badge.vote {
+            background: #3a2a2a;
+            border-color: #8a4a4a;
+            color: #f0a0a0;
+        }
+        .phase-badge.truth {
+            background: #2a4a3a;
+            border-color: #5a8a6a;
+            color: #b0e0b0;
         }
         .npc-speech {
             background: #0d1a1a;
@@ -451,6 +460,77 @@
             color: #a0e0a0;
             margin-left: 8px;
         }
+        .vote-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .vote-card {
+            background: #1f1618;
+            border: 2px solid #3d2e26;
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .vote-card:hover {
+            border-color: #7a5a4a;
+            background: #2a1c1a;
+        }
+        .vote-card.selected {
+            border-color: #dbb48c;
+            background: #2f1e1a;
+            box-shadow: 0 0 20px #b2826440;
+        }
+        .vote-card .v-avatar {
+            font-size: 2rem;
+            display: block;
+        }
+        .vote-card .v-name {
+            font-weight: 600;
+            color: #f0d5c0;
+            font-size: 0.9rem;
+            display: block;
+            margin-top: 2px;
+        }
+        .vote-card .v-title {
+            font-size: 0.6rem;
+            color: #b6967e;
+            display: block;
+        }
+        .truth-section {
+            background: #0a1a0a;
+            border: 2px solid #3a6a3a;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 12px 0;
+        }
+        .truth-section .truth-title {
+            color: #5aaa5a;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .truth-section .truth-body {
+            color: #d0e0d0;
+            line-height: 1.8;
+            font-size: 0.92rem;
+            white-space: pre-wrap;
+        }
+        .reveal-btn {
+            background: #3a5a3a;
+            border-color: #5a8a5a;
+            color: #d0f0d0;
+            font-size: 1rem;
+            padding: 10px 30px;
+        }
+        .reveal-btn:hover {
+            background: #4a6a4a;
+            border-color: #7aaa7a;
+        }
     </style>
 </head>
 <body>
@@ -458,14 +538,14 @@
     <div class="game-container" id="app">
         <h1>🌙 夜明珠 · 戏楼诡影</h1>
         <div class="subhead">
-            <span>🎭 1943 · 上海</span>
-            <span>🦋 最终版</span>
-            <span>⚡ 我的故事全解锁</span>
+            <span>🎭 民国 · 1943</span>
+            <span>🗳️ 投票凶手版</span>
+            <span>⚡ 投票后揭晓真相</span>
         </div>
 
         <div class="flex-between">
             <span class="phase-badge" id="phaseBadge">📌 选角阶段</span>
-            <span style="font-size:0.7rem; color:#b6967e;" id="stepCounter">NPC 0 / 6</span>
+            <span style="font-size:0.7rem; color:#b6967e;" id="stepCounter">NPC 0 / 5</span>
             <span style="font-size:0.7rem; color:#b6967e;" id="playerNameDisplay">👤 未选角色</span>
         </div>
 
@@ -475,7 +555,7 @@
                 <span style="font-weight:300; letter-spacing:2px; font-size:0.95rem;">🎴 选择你的角色</span>
                 <span class="text-muted">点击头像选择</span>
             </div>
-            <div class="character-grid" id="characterGrid"></div>
+            <div id="characterGrid" class="character-grid"></div>
             <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:6px 0;">
                 <button class="btn btn-primary" id="confirmMyRoleBtn">✓ 确认我的角色</button>
                 <button class="btn btn-green" id="markFriendBtn">🤝 标记朋友</button>
@@ -484,7 +564,7 @@
             <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:6px; font-size:0.65rem; color:#b6967e;">
                 <span>🟧 <strong>我的角色</strong> · 全部故事直接解锁</span>
                 <span>🟩 <strong>朋友角色</strong> · 仅显示头像，故事由朋友口述</span>
-                <span>⬜ <strong>NPC</strong> · 需要盘问逐步解锁</span>
+                <span>⬜ <strong>NPC</strong> · 需要盘问解锁碎片故事</span>
             </div>
         </div>
 
@@ -493,13 +573,14 @@
 
             <div class="phase-tip" id="phaseTip">
                 <strong>📖 你的全部故事已解锁</strong><br>
-                仔细阅读你的完整故事。朋友的角色请连麦时让他们自己说。NPC需要盘问解锁。
+                仔细阅读你的完整故事。盘问NPC获取更多碎片线索，然后投票找出凶手。
             </div>
 
             <div class="flex-row">
                 <button class="btn btn-gold" id="evidenceBtn">📜 搜证</button>
                 <button class="btn btn-primary" id="shareBtn">💬 分享指引</button>
                 <button class="btn btn-blue" id="npcStoryBtn">🎭 NPC讲故事</button>
+                <button class="btn btn-red" id="voteBtn">🗳️ 投票凶手</button>
             </div>
 
             <div id="npcSpeechContainer"></div>
@@ -534,14 +615,14 @@
                     <span style="font-size:0.85rem;">👥 角色状态</span>
                     <span class="text-muted">🟧我的 · 🟩朋友 · ⬜NPC</span>
                 </div>
-                <div class="character-grid" id="roleStatusGrid" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));"></div>
+                <div id="roleStatusGrid" class="character-grid" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));"></div>
             </div>
 
             <!-- 盘问区 -->
             <div class="card" id="npcInterrogation">
                 <div class="flex-between">
                     <span style="font-size:0.85rem;">🔍 盘问NPC · 选对象 + <strong>1个关键词</strong></span>
-                    <span class="text-muted" id="askHint">解锁NPC故事</span>
+                    <span class="text-muted" id="askHint">解锁NPC碎片故事</span>
                 </div>
                 <div class="flex-row" style="justify-content:flex-start; gap:5px; flex-wrap:wrap;" id="targetSelector"></div>
                 <div style="margin: 6px 0;">
@@ -551,6 +632,32 @@
                 <div class="flex-row" style="justify-content:space-between;">
                     <button class="btn btn-gold btn-sm" id="askBtn">⚡ 盘问NPC</button>
                     <button class="btn btn-secondary btn-sm" id="nextSceneBtn">▶ 推进剧情</button>
+                </div>
+            </div>
+
+            <!-- 投票区 -->
+            <div class="card" id="voteSection">
+                <div class="card-title">
+                    <span>🗳️ 投票凶手</span>
+                    <span class="text-muted">投给你认为的凶手</span>
+                </div>
+                <div id="voteGrid" class="vote-grid"></div>
+                <div class="flex-row">
+                    <button class="btn btn-red" id="submitVoteBtn">✅ 确认投票</button>
+                </div>
+            </div>
+
+            <!-- 真相揭晓区 -->
+            <div class="card" id="truthSection" style="border-color: #3a6a3a;">
+                <div class="card-title">
+                    <span>🕯️ 真相揭晓</span>
+                    <span class="text-muted">投票后解锁</span>
+                </div>
+                <div id="truthContent" style="color:#b6967e;font-size:0.85rem;padding:8px 0;">
+                    投票后点击「揭晓真相」查看完整故事和凶手真相。
+                </div>
+                <div class="flex-row">
+                    <button class="btn btn-green reveal-btn" id="revealTruthBtn">🕯️ 揭晓真相</button>
                 </div>
             </div>
 
@@ -577,6 +684,7 @@
         </div>
     </div>
 
+    <!-- 模态框 -->
     <div id="modalOverlay" class="modal-overlay hidden">
         <div class="modal-box fade-in" id="modalBox">
             <h3 id="modalTitle">📜 信息</h3>
@@ -586,309 +694,496 @@
     </div>
 
     <script>
-        (function() {
-            // ================================================================
-            // 角色数据 · 3层故事
-            // ================================================================
-            const CHARACTERS = [{
-                id: 'mei',
-                name: '梅寒笙',
-                emoji: '🎭',
-                title: '戏楼班主·师弟',
-                publicDesc: '程玉声的师弟，戏楼管事。',
-                layer1: '【你是谁】\n你叫梅寒笙，38岁，程玉声的师弟。你们从小一起在戏班长大，一起学戏，一起挨打。你一直都是"程玉声的师弟"——永远的第二名。\n\n【表面上的你】\n你表面上对他恭敬、顺从，是戏楼最得力的管事。所有人都觉得你是个"好师弟"——从不争，从不抢。\n\n但你心里有一团火，烧了二十年。',
-                layer2: '【你的秘密】\n你恨他。十年前师父临终把夜明珠传给了他，没传给你。师父说："珠子若传给你，戏楼就散了。"\n\n你不服。你等了二十年，等来一句"你比不上他"。\n\n昨夜你在后台和他大吵一架。你说："那颗珠子本来就是我的！" 他回了一句："你永远比不上我。"\n\n你失控了。你的手掐上了他的脖子。\n\n💡 第3层真相尚未解锁。',
-                layer3: '【完整真相】\n你掐住他的脖子，直到他不动了。你慌了——你把银簪插进他胸口，想伪装成刺杀。但你手在抖，银簪刺偏了。\n\n你逃离后台，跑到后巷，蹲在墙角吐了。你恨的不是他——你恨的是他说的那句话是真的。你确实永远比不上他。\n\n你杀了人。但你杀的是一个"你恨了二十年"的人。你该后悔吗？你心里有个声音说——"我终于比他强了。虽然是用这种方式。"',
-                unlockKeyword: '嫉妒',
-                knowMode: '暗凶',
-                isMurderer: true,
-                npcStory: '💬 【梅寒笙】"师父说「珠子若传给你，戏楼就散了」。我等了二十年，等来一句「你永远比不上我」。他说得对。我确实比不上他。"'
-            }, {
-                id: 'bai',
-                name: '白露浓',
-                emoji: '🌸',
-                title: '当家花旦·情人',
-                publicDesc: '程玉声最宠的徒弟，戏楼台柱子。',
-                layer1: '【你是谁】\n你叫白露浓，29岁，程玉声最宠的徒弟，也是戏楼的当家花旦。你唱《牡丹亭》的时候，全上海的男人都为你鼓掌。但你在乎的，只有一个男人的掌声。\n\n【表面上的你】\n你是程玉声的情人，全戏楼都知道。你自信、美丽、目中无人。你相信他是你的，谁也抢不走。\n\n但你错了。',
-                layer2: '【你的秘密】\n你发现他买了一张去重庆的船票——只买了一张。他不打算带你走。\n\n你在他上台前偷偷换了戏服，把银簪藏在袖中。你想当面质问他。但银簪不见了——它原本在化妆台上，等你伸手去拿的时候，它已经没了。\n\n你慌了。你四处翻找，但没找到。你以为是程玉声自己拿走了。你哭着上了台，唱完了那出《游园惊梦》。\n\n💡 第3层真相尚未解锁。',
-                layer3: '【完整真相】\n你后来才知道——他买了两张船票。一张他的名字，一张是空白的。他是想让你自己填上名字，让你选要不要跟他走。\n\n但他没来得及告诉你。他死了。\n\n你恨他骗了你十年。你恨他让你以为自己是他的全部。但你更恨的是——你到最后一刻，都没能告诉他："我愿意跟你走。"',
-                unlockKeyword: '船票',
-                knowMode: '无辜',
-                isMurderer: false,
-                npcStory: '💬 【白露浓】"他说「最后一幅画是画给你的」。我等了十年。最后发现，画里是另一个女人。他骗了我十年。但我还是爱他。"'
-            }, {
-                id: 'shen',
-                name: '沈砚之',
-                emoji: '📰',
-                title: '报社主编·军统',
-                publicDesc: '每场必到的剧评人，与程玉声私交甚密。',
-                layer1: '【你是谁】\n你叫沈砚之，42岁，报社主编，也是戏楼的常客。你每场必到，写的剧评能让一个戏子一夜成名。程玉声叫你"老沈"，你是他少数几个"朋友"。\n\n【表面上的你】\n你是个文化人，懂戏、懂诗、懂风月。你和程玉声喝过很多次酒，聊过很多次天。你觉得你是最了解他的人。\n\n但你骗了他三年。',
-                layer2: '【你的秘密】\n你是军统上海站的情报员。那颗夜明珠是清朝皇室流出的珍宝，日军特高课一直在找它。你接近程玉声是为了获取珠子的下落。\n\n三年了。你看着他在台上唱《长生殿》，看着他在后台卸妆，看着他对你笑。你一直在骗他。\n\n昨夜你向他坦白身份。他只说了一句："我知道你是谁。"\n\n💡 第3层真相尚未解锁。',
-                layer3: '【完整真相】\n他早就知道了。他从来没有怪过你。他最后一次见你，把夜明珠的藏处告诉了你——"珠子在我心里。你拿去吧，还给国家。"\n\n你哭了。你一个军统情报员，在戏楼后台哭得像个孩子。你说："我不配。" 他说："你配。你是我唯一信任的人。"\n\n你一直以为自己在骗他。但最后，是他骗了你——他让你以为他什么都不知道。他什么都知道。他还是信了你。',
-                unlockKeyword: '军统',
-                knowMode: '无辜',
-                isMurderer: false,
-                npcStory: '💬 【沈砚之】"我是军统的人。我骗了他三年。但他死前说「我知道你是谁」。他早就知道。他还是信了我。"'
-            }, {
-                id: 'gu',
-                name: '顾四娘',
-                emoji: '👩‍👦',
-                title: '化妆师·亲娘',
-                publicDesc: '程玉声的奶娘，戏楼最资深的老人。',
-                layer1: '【你是谁】\n你叫顾四娘，54岁，程玉声的奶娘。你从小带他长大，给他喂奶、换尿布、教他第一句唱词。你在戏楼待了四十年，所有人都叫你"四娘"。\n\n【表面上的你】\n你是戏楼的"活化石"，谁都要敬你三分。你不多话，只管化妆、收拾行头、照看这个那个。你看起来只是一个老人。\n\n但你是他亲娘。',
-                layer2: '【你的秘密】\n你是程玉声的亲娘。当年你被卖入戏班，与班主私通生下了他。为了他的前程，你一生不敢认他。你看着他长大，看着他成了"上海第一名旦"，你从来没叫过他一声"儿子"。\n\n夜明珠是你当年的陪嫁之物。你偷偷放进师父遗物里，想让他继承"母亲的遗产"。那是你唯一能留给他的东西。\n\n昨夜他握着你的手说："娘，我都知道了。" 你哭着说："那珠子本就是你的，谁也拿不走。"\n\n💡 第3层真相尚未解锁。',
-                layer3: '【完整真相】\n你一生不敢认他。你怕"奶娘的儿子"这个身份，会毁了他的前程。但你知道他早就知道了——他翻过你的旧箱子，看过那张泛黄的卖身契。他从来没有问过你。他只是在每次上台前，让你给他化妆的时候，轻轻叫你一声"四娘"。\n\n你最后一次给他化妆，是在他死的那晚。你画了他的眉，涂了他的唇，你看着他的脸，说："我的儿。" 他笑了。他说："娘，我走了。"\n\n你哭了一整夜。你终于叫了他一声"儿"。他再也不会应你了。',
-                unlockKeyword: '亲生',
-                knowMode: '无辜',
-                isMurderer: false,
-                npcStory: '💬 【顾四娘】"我一生不敢认他。他死的那晚，他终于叫我一声「娘」。他终于叫了。然后他就走了。"'
-            }, {
-                id: 'qiao',
-                name: '乔知秋',
-                emoji: '🎵',
-                title: '琴师·翻译官',
-                publicDesc: '半年前进戏楼的琵琶手，白露浓的闺蜜。',
-                layer1: '【你是谁】\n你叫乔知秋，24岁，半年前进了戏楼当琴师。你弹得一手好琵琶，白露浓最喜欢你给她伴奏。你们成了闺蜜，她什么都跟你说。\n\n【表面上的你】\n你温柔、安静、善解人意。白露浓说你是"戏楼里最干净的人"。她不知道，你身上的血比她想象中要深。\n\n你是日军特高课的翻译官。',
-                layer2: '【你的秘密】\n你奉命潜伏在戏楼寻找夜明珠。你的上司说："找到珠子，或者杀了程玉声。"\n\n你准备了毒针，放在手帕里。你一直在等"合适的时机"。但你爱上了白露浓——你看着她为了程玉声哭、笑、疯，你心里有一个声音说："为什么她爱的是他？"\n\n你昨晚偷听到程玉声和白露浓的争吵。程玉声说："你以为她为什么来？她是日本人派来的。" 你以为身份暴露，慌乱中撞倒了花瓶。\n\n💡 第3层真相尚未解锁。',
-                layer3: '【完整真相】\n你冲进后台，想解释。但你看见他倒在地上，胸口插着银簪。你手里的毒针还没来得及用。\n\n你站了很久。你看着他的尸体，看着自己手心里的毒针。你突然笑了——你笑了，因为你终于不用选了。你不需要杀他，他已经死了。\n\n你收起毒针，擦了擦手。你对自己说："白露浓，他死了。你现在可以爱我了。"\n\n但你永远不知道，程玉声说的那句话，是对白露浓说的——"你以为她为什么来？" 他不是在说你，他是在说白露浓自己。白露浓也是日本人派来的。你们都在骗她。',
-                unlockKeyword: '翻译官',
-                knowMode: '无辜',
-                isMurderer: false,
-                npcStory: '💬 【乔知秋】"我是日本人派来的。我准备了毒针。但没用上。我该庆幸，还是该后悔？"'
-            }];
+        // ================================================================
+        // 角色数据
+        // ================================================================
+        const CHARACTERS = [{
+            id: 'mei',
+            name: '梅寒笙',
+            emoji: '🎭',
+            title: '戏楼班主·师弟',
+            layer1: '【你是谁】\n你叫梅寒笙，38岁，程玉声的师弟。你们从小一起在戏班长大，一起学戏，一起挨打。你一直都是"程玉声的师弟"——永远的第二名。\n\n【表面上的你】\n你表面上对他恭敬、顺从，是戏楼最得力的管事。所有人都觉得你是个"好师弟"——从不争，从不抢。\n\n但你心里有一团火，烧了二十年。',
+            layer2: '【你的秘密】\n你恨他。十年前师父临终把夜明珠传给了他，没传给你。师父说："珠子若传给你，戏楼就散了。"\n\n你不服。你等了二十年，等来一句"你比不上他"。\n\n昨夜你在后台和他大吵一架。你说："那颗珠子本来就是我的！" 他回了一句："你永远比不上我。"\n\n你失控了。你的手掐上了他的脖子。\n\n💡 第3层真相尚未解锁。',
+            layer3: '【你的完整故事】\n你掐住他的脖子，直到他不动了。你慌了——你把银簪插进他胸口，想伪装成刺杀。但你手在抖，银簪刺偏了。\n\n你逃离后台，跑到后巷，蹲在墙角吐了。你恨的不是他——你恨的是他说的那句话是真的。你确实永远比不上他。\n\n你杀了人。但你杀的是一个"你恨了二十年"的人。你该后悔吗？你心里有个声音说——"我终于比他强了。虽然是用这种方式。"',
+            unlockKeyword: '嫉妒',
+            knowMode: '暗凶',
+            isMurderer: true,
+            npcStory: '💬 【梅寒笙】"师父说「珠子若传给你，戏楼就散了」。我等了二十年，等来一句「你永远比不上他」。他说得对。我确实比不上他。"'
+        }, {
+            id: 'bai',
+            name: '白露浓',
+            emoji: '🌸',
+            title: '当家花旦·情人',
+            layer1: '【你是谁】\n你叫白露浓，29岁，程玉声最宠的徒弟，也是戏楼的当家花旦。你唱《牡丹亭》的时候，全上海的男人都为你鼓掌。但你在乎的，只有一个男人的掌声。\n\n【表面上的你】\n你是程玉声的情人，全戏楼都知道。你自信、美丽、目中无人。你相信他是你的，谁也抢不走。\n\n但你错了。',
+            layer2: '【你的秘密】\n你发现他买了一张去重庆的船票——只买了一张。他不打算带你走。\n\n你在他上台前偷偷换了戏服，把银簪藏在袖中。你想当面质问他。但银簪不见了——它原本在化妆台上，等你伸手去拿的时候，它已经没了。\n\n你慌了。你四处翻找，但没找到。你以为是程玉声自己拿走了。你哭着上了台，唱完了那出《游园惊梦》。\n\n💡 第3层真相尚未解锁。',
+            layer3: '【你的完整故事】\n你后来才知道——他买了两张船票。一张他的名字，一张是空白的。他是想让你自己填上名字，让你选要不要跟他走。\n\n但他没来得及告诉你。他死了。\n\n你恨他骗了你十年。你恨他让你以为自己是他的全部。但你更恨的是——你到最后一刻，都没能告诉他："我愿意跟你走。"',
+            unlockKeyword: '船票',
+            knowMode: '无辜',
+            isMurderer: false,
+            npcStory: '💬 【白露浓】"他说「最后一幅画是画给你的」。我等了十年。最后发现，画里是另一个女人。他骗了我十年。但我还是爱他。"'
+        }, {
+            id: 'shen',
+            name: '沈砚之',
+            emoji: '📰',
+            title: '报社主编·军统',
+            layer1: '【你是谁】\n你叫沈砚之，42岁，报社主编，也是戏楼的常客。你每场必到，写的剧评能让一个戏子一夜成名。程玉声叫你"老沈"，你是他少数几个"朋友"。\n\n【表面上的你】\n你是个文化人，懂戏、懂诗、懂风月。你和程玉声喝过很多次酒，聊过很多次天。你觉得你是最了解他的人。\n\n但你骗了他三年。',
+            layer2: '【你的秘密】\n你是军统上海站的情报员。那颗夜明珠是清朝皇室流出的珍宝，日军特高课一直在找它。你接近程玉声是为了获取珠子的下落。\n\n三年了。你看着他在台上唱《长生殿》，看着他在后台卸妆，看着他对你笑。你一直在骗他。\n\n昨夜你向他坦白身份。他只说了一句："我知道你是谁。"\n\n💡 第3层真相尚未解锁。',
+            layer3: '【你的完整故事】\n他早就知道了。他从来没有怪过你。他最后一次见你，把夜明珠的藏处告诉了你——"珠子在我心里。你拿去吧，还给国家。"\n\n你哭了。你一个军统情报员，在戏楼后台哭得像个孩子。你说："我不配。" 他说："你配。你是我唯一信任的人。"\n\n你一直以为自己在骗他。但最后，是他骗了你——他让你以为他什么都不知道。他什么都知道。他还是信了你。',
+            unlockKeyword: '军统',
+            knowMode: '无辜',
+            isMurderer: false,
+            npcStory: '💬 【沈砚之】"我是军统的人。我骗了他三年。但他死前说「我知道你是谁」。他早就知道。他还是信了我。"'
+        }, {
+            id: 'gu',
+            name: '顾四娘',
+            emoji: '👩‍👦',
+            title: '化妆师·亲娘',
+            layer1: '【你是谁】\n你叫顾四娘，54岁，程玉声的奶娘。你从小带他长大，给他喂奶、换尿布、教他第一句唱词。你在戏楼待了四十年，所有人都叫你"四娘"。\n\n【表面上的你】\n你是戏楼的"活化石"，谁都要敬你三分。你不多话，只管化妆、收拾行头、照看这个那个。你看起来只是一个老人。\n\n但你是他亲娘。',
+            layer2: '【你的秘密】\n你是程玉声的亲娘。当年你被卖入戏班，与班主私通生下了他。为了他的前程，你一生不敢认他。你看着他长大，看着他成了"上海第一名旦"，你从来没叫过他一声"儿子"。\n\n夜明珠是你当年的陪嫁之物。你偷偷放进师父遗物里，想让他继承"母亲的遗产"。那是你唯一能留给他的东西。\n\n昨夜他握着你的手说："娘，我都知道了。" 你哭着说："那珠子本就是你的，谁也拿不走。"\n\n💡 第3层真相尚未解锁。',
+            layer3: '【你的完整故事】\n你一生不敢认他。你怕"奶娘的儿子"这个身份，会毁了他的前程。但你知道他早就知道了——他翻过你的旧箱子，看过那张泛黄的卖身契。他从来没有问过你。他只是在每次上台前，让你给他化妆的时候，轻轻叫你一声"四娘"。\n\n你最后一次给他化妆，是在他死的那晚。你画了他的眉，涂了他的唇，你看着他的脸，说："我的儿。" 他笑了。他说："娘，我走了。"\n\n你哭了一整夜。你终于叫了他一声"儿"。他再也不会应你了。',
+            unlockKeyword: '亲生',
+            knowMode: '无辜',
+            isMurderer: false,
+            npcStory: '💬 【顾四娘】"我一生不敢认他。他死的那晚，他终于叫我一声「娘」。他终于叫了。然后他就走了。"'
+        }, {
+            id: 'qiao',
+            name: '乔知秋',
+            emoji: '🎵',
+            title: '琴师·翻译官',
+            layer1: '【你是谁】\n你叫乔知秋，24岁，半年前进了戏楼当琴师。你弹得一手好琵琶，白露浓最喜欢你给她伴奏。你们成了闺蜜，她什么都跟你说。\n\n【表面上的你】\n你温柔、安静、善解人意。白露浓说你是"戏楼里最干净的人"。她不知道，你身上的血比她想象中要深。\n\n你是日军特高课的翻译官。',
+            layer2: '【你的秘密】\n你奉命潜伏在戏楼寻找夜明珠。你的上司说："找到珠子，或者杀了程玉声。"\n\n你准备了毒针，放在手帕里。你一直在等"合适的时机"。但你爱上了白露浓——你看着她为了程玉声哭、笑、疯，你心里有一个声音说："为什么她爱的是他？"\n\n你昨晚偷听到程玉声和白露浓的争吵。程玉声说："你以为她为什么来？她是日本人派来的。" 你以为身份暴露，慌乱中撞倒了花瓶。\n\n💡 第3层真相尚未解锁。',
+            layer3: '【你的完整故事】\n你冲进后台，想解释。但你看见他倒在地上，胸口插着银簪。你手里的毒针还没来得及用。\n\n你站了很久。你看着他的尸体，看着自己手心里的毒针。你突然笑了——你笑了，因为你终于不用选了。你不需要杀他，他已经死了。\n\n你收起毒针，擦了擦手。你对自己说："白露浓，他死了。你现在可以爱我了。"\n\n但你永远不知道，程玉声说的那句话，是对白露浓说的——"你以为她为什么来？" 他不是在说你，他是在说白露浓自己。白露浓也是日本人派来的。你们都在骗她。',
+            unlockKeyword: '翻译官',
+            knowMode: '无辜',
+            isMurderer: false,
+            npcStory: '💬 【乔知秋】"我是日本人派来的。我准备了毒针。但没用上。我该庆幸，还是该后悔？"'
+        }];
 
-            const DEAD = { id: 'cheng', name: '程玉声', emoji: '💔', title: '名伶·死者', publicDesc: '上海第一名旦，死前血书「夜明珠还我」。不可选。' };
+        const KEYWORDS = ['嫉妒', '船票', '军统', '亲生', '翻译官'];
+        const KEYWORD_MAP = {
+            '嫉妒': { targetId: 'mei', layer: 2 },
+            '船票': { targetId: 'bai', layer: 2 },
+            '军统': { targetId: 'shen', layer: 2 },
+            '亲生': { targetId: 'gu', layer: 2 },
+            '翻译官': { targetId: 'qiao', layer: 2 },
+        };
 
-            const KEYWORDS = ['嫉妒', '船票', '军统', '亲生', '翻译官', '夜明珠'];
-            const KEYWORD_MAP = {
-                '嫉妒': { targetId: 'mei', layer: 2 },
-                '船票': { targetId: 'bai', layer: 2 },
-                '军统': { targetId: 'shen', layer: 2 },
-                '亲生': { targetId: 'gu', layer: 2 },
-                '翻译官': { targetId: 'qiao', layer: 2 },
-                '夜明珠': { targetId: null, isGlobal: true,
-                    text: '🟢 全局真相：程玉声是自杀。他用自己的死换所有人的自由。银簪是幌子，掐痕才是致命伤。梅寒笙掐死了他。夜明珠不在戏楼——在他心里。' }
-            };
+        const EVIDENCES = [{
+            id: 'e1',
+            title: '📜 死亡报告',
+            body: '死者：程玉声\n死亡时间：戌时三刻（19:45）\n死因：银簪插心，但法医发现银簪偏离心脏两寸，真正致命是颈部掐痕。'
+        }, {
+            id: 'e2',
+            title: '📊 后台证物',
+            body: '• 化妆台上银簪消失\n• 后台有摔碎的茶杯\n• 后巷发现一枚带血的袖扣（梅寒笙的）'
+        }, {
+            id: 'e3',
+            title: '✉️ 程玉声的绝笔信',
+            body: '"夜明珠不在地下室——它在我心里。我唱了一辈子杜丽娘，最后才明白，惊梦的不是我，是你们。"'
+        }, {
+            id: 'e4',
+            title: '📦 物品清单',
+            body: '• 船票×2（一张空白）\n• 军统密电码本（沈砚之）\n• 毒针（乔知秋）\n• 泛黄卖身契（顾四娘）'
+        }];
 
-            const EVIDENCES = [{
-                id: 'e1',
-                title: '📜 死亡报告',
-                body: '死者：程玉声\n死亡时间：戌时三刻（19:45）\n死因：银簪插心，但法医发现银簪偏离心脏两寸，真正致命是颈部掐痕。'
-            }, {
-                id: 'e2',
-                title: '📊 后台证物',
-                body: '• 化妆台上银簪消失\n• 后台有摔碎的茶杯\n• 后巷发现一枚带血的袖扣（梅寒笙的）'
-            }, {
-                id: 'e3',
-                title: '✉️ 程玉声的绝笔信',
-                body: '"夜明珠不在地下室——它在我心里。我唱了一辈子杜丽娘，最后才明白，惊梦的不是我，是你们。"'
-            }, {
-                id: 'e4',
-                title: '📦 物品清单',
-                body: '• 船票×2（一张空白）\n• 军统密电码本（沈砚之）\n• 毒针（乔知秋）\n• 泛黄卖身契（顾四娘）'
-            }];
+        const NPC_STORIES = [{
+            scene: 0,
+            stories: [
+                '💬 【梅寒笙】"我等了二十年。师父说「珠子传给你，戏楼就散了」。他说得对。我确实比不上他。"',
+                '💬 【顾四娘】"他最后叫我一声「娘」。我等了一辈子，等来这一声。然后他就走了。"',
+                '💬 【乔知秋】"我准备了毒针，没用上。他死的那晚，我在后台站了很久，看着他的手。"'
+            ]
+        }, {
+            scene: 1,
+            stories: [
+                '💬 【白露浓】"他买了两张船票。一张是他的，一张是空白的。他想让我自己填名字。但我没来得及。"',
+                '💬 【沈砚之】"他早就知道我是军统的人。他还是把珠子给了我。他说「你配」。"'
+            ]
+        }, {
+            scene: 2,
+            stories: [
+                '💬 【程玉声·遗言】"我骗了所有人。我是自杀。我想用我的死，让所有人自由。"',
+                '💬 【全角色】"我们都以为自己是凶手。但其实，我们都是困住他的人。他用死，放了我们。"'
+            ]
+        }];
 
-            const NPC_STORIES = [{
-                scene: 0,
-                stories: [
-                    '💬 【梅寒笙】"我等了二十年。师父说「珠子传给你，戏楼就散了」。他说得对。我确实比不上他。"',
-                    '💬 【顾四娘】"他最后叫我一声「娘」。我等了一辈子，等来这一声。然后他就走了。"',
-                    '💬 【乔知秋】"我准备了毒针，没用上。他死的那晚，我在后台站了很久，看着他的手。"'
-                ]
-            }, {
-                scene: 1,
-                stories: [
-                    '💬 【白露浓】"他买了两张船票。一张是他的，一张是空白的。他想让我自己填名字。但我没来得及。"',
-                    '💬 【沈砚之】"他早就知道我是军统的人。他还是把珠子给了我。他说「你配」。"'
-                ]
-            }, {
-                scene: 2,
-                stories: [
-                    '💬 【程玉声·遗言】"我骗了所有人。我是自杀。我想用我的死，让所有人自由。"',
-                    '💬 【全角色】"我们都以为自己是凶手。但其实，我们都是困住他的人。他用死，放了我们。"'
-                ]
-            }];
+        const GLOBAL_TRUTH = {
+            title: '🟢 真相 · 三重反转',
+            body: `【第一层反转 · 银簪不是致命伤】\n银簪偏离心脏两寸，真正致命的是颈部掐痕——梅寒笙掐死了程玉声。但程玉声在被掐之前，已经服下了慢性毒药。\n\n【第二层反转 · 程玉声是自杀】\n程玉声早就知道自己时日无多。他用自己的死，换所有人的自由。他让梅寒笙以为自己是凶手，让白露浓以为他负了她，让沈砚之以为他骗了他——但他骗了所有人，是为了让他们"恨他"，而不是"爱他"。\n\n【第三层反转 · 夜明珠的真相】\n夜明珠不在地下室——在程玉声心里。他说的"夜明珠还我"，是说"把我的唱腔，还给戏台"。他把夜明珠的藏处告诉了沈砚之，让军统护送去重庆。\n\n【凶手是谁？】\n梅寒笙是物理上的凶手（掐死了他）。\n程玉声是真正的"自杀者"——他用自己的死，换了所有人的自由。`
+        };
 
-            const SCENES = [
-                { id: 0, title: '第一幕 · 封箱惊梦', desc: '程玉声倒在台上，银簪插心，血书「夜明珠还我」。所有人都有嫌疑……' },
-                { id: 1, title: '第二幕 · 后台暗流', desc: '搜证发现：银簪偏离心脏，真正致命是掐痕。每个人都有自己的秘密……' },
-                { id: 2, title: '第三幕 · 夜明珠归处', desc: '真相揭晓：梅寒笙掐死了他。程玉声用自己的死换所有人自由。' }
-            ];
+        const SCENES = [
+            { id: 0, title: '第一幕 · 封箱惊梦', desc: '程玉声倒在台上，银簪插心，血书「夜明珠还我」。所有人都有嫌疑……' },
+            { id: 1, title: '第二幕 · 后台暗流', desc: '搜证发现：银簪偏离心脏，真正致命是掐痕。每个人都有自己的秘密……' },
+            { id: 2, title: '第三幕 · 夜明珠归处', desc: '线索已齐。现在投票选出你心中的凶手。' }
+        ];
 
-            // ========== 状态 ==========
-            let state = {
-                myRoleId: null,
-                friendIds: [],
-                sceneIndex: 0,
-                keywordsUsed: [],
-                unlockedLayers: {},
-                unlockedGlobal: false,
-                log: [],
-                relations: [],
-                endingChosen: null,
-                npcStoryIndex: 0,
-            };
+        // ================================================================
+        // 状态
+        // ================================================================
+        let state = {
+            myRoleId: null,
+            friendIds: [],
+            sceneIndex: 0,
+            keywordsUsed: [],
+            unlockedLayers: {},
+            log: [],
+            relations: [],
+            endingChosen: null,
+            npcStoryIndex: 0,
+            voteTarget: null,
+            hasVoted: false,
+            truthRevealed: false,
+        };
 
-            const $ = id => document.getElementById(id);
-            const phaseBadge = $('phaseBadge');
-            const phaseTip = $('phaseTip');
-            const stepCounter = $('stepCounter');
-            const playerNameDisplay = $('playerNameDisplay');
-            const characterGrid = $('characterGrid');
-            const confirmBtn = $('confirmMyRoleBtn');
-            const markFriendBtn = $('markFriendBtn');
-            const resetSelBtn = $('resetSelectionBtn');
-            const gamePanel = $('gamePanel');
-            const stepSelect = $('stepSelect');
-            const sceneTitle = $('sceneTitle');
-            const scenePhase = $('scenePhase');
-            const sceneDesc = $('sceneDesc');
-            const targetSelector = $('targetSelector');
-            const keywordPool = $('keywordPool');
-            const askBtn = $('askBtn');
-            const nextSceneBtn = $('nextSceneBtn');
-            const logArea = $('logArea');
-            const relationSvg = $('relationSvg');
-            const relationCount = $('relationCount');
-            const endingSection = $('endingSection');
-            const endingResetBtn = $('endingResetBtn');
-            const endingButterflyBtn = $('endingButterflyBtn');
-            const modalOverlay = $('modalOverlay');
-            const modalTitle = $('modalTitle');
-            const modalBody = $('modalBody');
-            const modalCloseBtn = $('modalCloseBtn');
-            const clearLogBtn = $('clearLogBtn');
-            const mySecretContent = $('mySecretContent');
-            const roleStatusGrid = $('roleStatusGrid');
-            const friendList = $('friendList');
-            const evidenceBtn = $('evidenceBtn');
-            const shareBtn = $('shareBtn');
-            const npcStoryBtn = $('npcStoryBtn');
-            const npcSpeechContainer = $('npcSpeechContainer');
+        // ================================================================
+        // DOM
+        // ================================================================
+        const $ = id => document.getElementById(id);
+        const phaseBadge = $('phaseBadge');
+        const phaseTip = $('phaseTip');
+        const stepCounter = $('stepCounter');
+        const playerNameDisplay = $('playerNameDisplay');
+        const characterGrid = $('characterGrid');
+        const confirmBtn = $('confirmMyRoleBtn');
+        const markFriendBtn = $('markFriendBtn');
+        const resetSelBtn = $('resetSelectionBtn');
+        const gamePanel = $('gamePanel');
+        const stepSelect = $('stepSelect');
+        const sceneTitle = $('sceneTitle');
+        const scenePhase = $('scenePhase');
+        const sceneDesc = $('sceneDesc');
+        const targetSelector = $('targetSelector');
+        const keywordPool = $('keywordPool');
+        const askBtn = $('askBtn');
+        const nextSceneBtn = $('nextSceneBtn');
+        const logArea = $('logArea');
+        const relationSvg = $('relationSvg');
+        const relationCount = $('relationCount');
+        const endingSection = $('endingSection');
+        const endingResetBtn = $('endingResetBtn');
+        const endingButterflyBtn = $('endingButterflyBtn');
+        const modalOverlay = $('modalOverlay');
+        const modalTitle = $('modalTitle');
+        const modalBody = $('modalBody');
+        const modalCloseBtn = $('modalCloseBtn');
+        const clearLogBtn = $('clearLogBtn');
+        const mySecretContent = $('mySecretContent');
+        const roleStatusGrid = $('roleStatusGrid');
+        const friendList = $('friendList');
+        const evidenceBtn = $('evidenceBtn');
+        const shareBtn = $('shareBtn');
+        const npcStoryBtn = $('npcStoryBtn');
+        const npcSpeechContainer = $('npcSpeechContainer');
+        const voteGrid = $('voteGrid');
+        const submitVoteBtn = $('submitVoteBtn');
+        const voteBtn = $('voteBtn');
+        const truthContent = $('truthContent');
+        const revealTruthBtn = $('revealTruthBtn');
 
-            function getMyChar() { return CHARACTERS.find(c => c.id === state.myRoleId); }
+        function getMyChar() { return CHARACTERS.find(c => c.id === state.myRoleId); }
 
-            function isMyChar(id) { return state.myRoleId === id; }
+        function isMyChar(id) { return state.myRoleId === id; }
 
-            function isFriend(id) { return state.friendIds.includes(id); }
+        function isFriend(id) { return state.friendIds.includes(id); }
 
-            function getUnlockedLayers(roleId) {
-                return state.unlockedLayers[roleId] || [];
-            }
+        function getUnlockedLayers(roleId) {
+            return state.unlockedLayers[roleId] || [];
+        }
 
-            function isNPC(id) { return !isMyChar(id) && !isFriend(id); }
+        function isNPC(id) { return !isMyChar(id) && !isFriend(id); }
 
-            function getNPCList() { return CHARACTERS.filter(c => isNPC(c.id)); }
+        function getNPCList() { return CHARACTERS.filter(c => isNPC(c.id)); }
 
-            function addLog(msg, type = 'system', isNpc = false) {
-                state.log.unshift({ msg, type, time: new Date().toLocaleTimeString(), isNpc });
-                renderLog();
-            }
+        function addLog(msg, type = 'system', isNpc = false) {
+            state.log.unshift({ msg, type, time: new Date().toLocaleTimeString(), isNpc });
+            renderLog();
+        }
 
-            function renderLog() {
-                logArea.innerHTML = state.log.slice(0, 40).map(e => {
-                    const cls = e.isNpc ? 'npc' : (e.type === 'player' ? 'player' : 'system');
-                    return `<div class="log-entry ${cls}">[${e.time}] ${e.msg}</div>`;
-                }).join('');
-            }
+        function renderLog() {
+            logArea.innerHTML = state.log.slice(0, 40).map(e => {
+                const cls = e.isNpc ? 'npc' : (e.type === 'player' ? 'player' : 'system');
+                return `<div class="log-entry ${cls}">[${e.time}] ${e.msg}</div>`;
+            }).join('');
+        }
 
-            function renderCharSelection() {
-                const all = [...CHARACTERS];
-                characterGrid.innerHTML = all.map(ch => {
-                    const isMy = isMyChar(ch.id);
-                    const isFr = isFriend(ch.id);
-                    const sel = isMy ? 'selected' : '';
-                    const layers = getUnlockedLayers(ch.id);
-                    let statusLabel = '';
-                    if (isMy) statusLabel = '⭐ 我的';
-                    else if (isFr) statusLabel = '🤝 朋友';
-                    else if (layers.length > 0) statusLabel = `L${layers.join('')}`;
-                    else statusLabel = 'NPC';
+        // ================================================================
+        // 渲染函数
+        // ================================================================
+        function renderCharSelection() {
+            const all = [...CHARACTERS];
+            characterGrid.innerHTML = all.map(ch => {
+                const isMy = isMyChar(ch.id);
+                const isFr = isFriend(ch.id);
+                const sel = isMy ? 'selected' : '';
+                const layers = getUnlockedLayers(ch.id);
+                let statusLabel = '';
+                if (isMy) statusLabel = '⭐ 我的';
+                else if (isFr) statusLabel = '🤝 朋友';
+                else if (layers.length > 0) statusLabel = `L${layers.join('')}`;
+                else statusLabel = 'NPC';
 
-                    let badge = '';
-                    if (isMy) badge = '<span class="badge badge-me">我的</span>';
-                    else if (isFr) badge = '<span class="badge badge-friend">朋友</span>';
-                    else if (layers.length > 0) badge = '<span class="badge badge-unlocked">已解锁</span>';
-                    else badge = '<span class="badge badge-npc">NPC</span>';
+                let badge = '';
+                if (isMy) badge = '<span class="badge badge-me">我的</span>';
+                else if (isFr) badge = '<span class="badge badge-friend">朋友</span>';
+                else if (layers.length > 0) badge = '<span class="badge badge-unlocked">已解锁</span>';
+                else badge = '<span class="badge badge-npc">NPC</span>';
 
-                    return `<div class="char-card ${sel}" data-id="${ch.id}">
+                return `<div class="char-card ${sel}" data-id="${ch.id}">
                         <span class="avatar">${ch.emoji}</span>
                         <span class="name">${ch.name}</span>
                         <span class="sub">${ch.title} · ${statusLabel}</span>
                         ${badge}
                     </div>`;
-                }).join('');
+            }).join('');
 
-                document.querySelectorAll('.char-card[data-id]').forEach(el => {
-                    el.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        if (state.myRoleId === id) {
-                            state.myRoleId = null;
-                        } else {
-                            state.myRoleId = id;
-                        }
-                        renderCharSelection();
-                        const my = getMyChar();
-                        confirmBtn.textContent = my ? `✓ 我的角色: ${my.name}` : '✓ 确认我的角色';
-                    });
+            document.querySelectorAll('#characterGrid .char-card[data-id]').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (state.myRoleId === id) {
+                        state.myRoleId = null;
+                    } else {
+                        state.myRoleId = id;
+                    }
+                    renderCharSelection();
+                    const my = getMyChar();
+                    confirmBtn.textContent = my ? `✓ 我的角色: ${my.name}` : '✓ 确认我的角色';
                 });
+            });
+        }
+
+        function renderKeywords() {
+            const targetableIds = getNPCList().map(c => c.id);
+            const relevantKeywords = KEYWORDS.filter(kw => {
+                const mapping = KEYWORD_MAP[kw];
+                return targetableIds.includes(mapping.targetId);
+            });
+            keywordPool.innerHTML = relevantKeywords.map(kw => {
+                const used = state.keywordsUsed.includes(kw);
+                return `<span class="keyword-tag ${used?'used':''}" data-keyword="${kw}">${kw}</span>`;
+            }).join('');
+            document.querySelectorAll('#keywordPool .keyword-tag:not(.used)').forEach(el => {
+                el.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+        }
+
+        function renderTargets() {
+            const targets = getNPCList();
+            targetSelector.innerHTML = targets.map(ch => {
+                const layers = getUnlockedLayers(ch.id);
+                return `<button class="btn btn-sm btn-secondary target-btn" data-id="${ch.id}">${ch.emoji} ${ch.name} L${layers.length}/3</button>`;
+            }).join('');
+            if (targets.length === 0) {
+                targetSelector.innerHTML =
+                    `<div style="color:#5a5a5a;font-size:0.8rem;padding:4px;">所有角色都是朋友，无需盘问</div>`;
+            }
+            const btns = targetSelector.querySelectorAll('.target-btn');
+            if (btns.length) btns[0]?.classList.add('btn-gold');
+            btns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    btns.forEach(b => b.classList.remove('btn-gold'));
+                    this.classList.add('btn-gold');
+                });
+            });
+        }
+
+        function getSelectedKeyword() {
+            const active = keywordPool.querySelectorAll('.keyword-tag.active:not(.used)');
+            return active.length > 0 ? active[0].dataset.keyword : null;
+        }
+
+        function getSelectedTarget() {
+            const active = targetSelector.querySelector('.btn-gold');
+            return active ? active.dataset.id : null;
+        }
+
+        function tryUnlockNPC(keyword, targetId) {
+            if (!keyword || state.keywordsUsed.includes(keyword)) return null;
+            if (isMyChar(targetId)) return { type: 'my', msg: '这是你自己的角色，已全部解锁' };
+            if (isFriend(targetId)) return { type: 'friend', msg: '这是朋友角色，故事由朋友口述' };
+
+            const mapping = KEYWORD_MAP[keyword];
+            if (!mapping) return null;
+
+            if (mapping.targetId === targetId) {
+                const char = CHARACTERS.find(c => c.id === targetId);
+                if (!char) return null;
+                const currentLayers = getUnlockedLayers(targetId);
+                const nextLayer = mapping.layer || 2;
+                if (currentLayers.includes(nextLayer)) {
+                    return { type: 'already', msg: `「${char.name}」的第${nextLayer}层已解锁` };
+                }
+                if (nextLayer === 3 && !currentLayers.includes(2)) {
+                    return { type: 'prereq', msg: `需要先解锁「${char.name}」的第2层` };
+                }
+                if (!state.unlockedLayers[targetId]) state.unlockedLayers[targetId] = [];
+                state.unlockedLayers[targetId].push(nextLayer);
+                state.keywordsUsed.push(keyword);
+                let layerText = '';
+                if (nextLayer === 2) layerText = char.layer2;
+                else if (nextLayer === 3) layerText = char.layer3;
+                return { type: 'layer', charId: targetId, layer: nextLayer, text: layerText };
             }
 
-            function renderFriendList() {
-                if (state.friendIds.length === 0) {
-                    friendList.innerHTML =
-                        `<div style="grid-column:1/-1;text-align:center;color:#5a5a5a;font-size:0.85rem;padding:12px;">还没有标记朋友，点击「标记朋友」添加</div>`;
-                    return;
+            if (mapping.targetId) {
+                const expectedChar = CHARACTERS.find(c => c.id === mapping.targetId);
+                return { type: 'wrong', msg: `「${keyword}」是 ${expectedChar?.name} 的关键词` };
+            }
+            return null;
+        }
+
+        function addRelation(charId) {
+            if (!state.relations.some(r => r.a === charId && r.b === 'cheng')) {
+                state.relations.push({ a: charId, b: 'cheng', label: charId });
+                renderRelation();
+            }
+        }
+
+        function renderRelation() {
+            const svg = relationSvg;
+            const w = 400,
+                h = 200;
+            const pos = {
+                mei: { x: 60, y: 70 },
+                bai: { x: 150, y: 30 },
+                shen: { x: 250, y: 30 },
+                gu: { x: 60, y: 150 },
+                qiao: { x: 150, y: 180 },
+                cheng: { x: 340, y: 100 }
+            };
+            const names = Object.fromEntries(CHARACTERS.map(c => [c.id, c.name]));
+            names.cheng = '程玉声';
+            let html = `<rect width="${w}" height="${h}" fill="#0e0a0c" rx="16" />`;
+            state.relations.forEach(r => {
+                const p1 = pos[r.a],
+                    p2 = pos[r.b];
+                if (p1 && p2) {
+                    const isRed = r.a === 'mei' || r.b === 'mei';
+                    html +=
+                        `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${isRed?'#b23a3a':'#b28264'}" stroke-width="${isRed?'3':'1.5'}" opacity="0.6" />`;
                 }
-                const friends = state.friendIds.map(id => CHARACTERS.find(c => c.id === id)).filter(Boolean);
-                friendList.innerHTML = friends.map(ch => `
+            });
+            Object.entries(pos).forEach(([id, p]) => {
+                const name = names[id] || id;
+                const isMy = isMyChar(id);
+                const isFr = isFriend(id);
+                const layers = getUnlockedLayers(id);
+                const isDead = id === 'cheng';
+                let fill = '#2a1d1a';
+                if (isDead) fill = '#1a0a0a';
+                else if (isMy) fill = '#6d3f30';
+                else if (isFr) fill = '#2a4a3a';
+                else if (layers.length > 0) fill = '#2a3a2a';
+                let stroke = '#5a4a3a';
+                if (isDead) stroke = '#5a2a2a';
+                else if (isMy) stroke = '#c9a77b';
+                else if (isFr) stroke = '#5a8a6a';
+                else if (layers.length > 0) stroke = '#5a7a5a';
+                html +=
+                    `<circle cx="${p.x}" cy="${p.y}" r="${isDead?10:14}" fill="${fill}" stroke="${stroke}" stroke-width="2" />`;
+                const label = isDead ? '程' : name.slice(0, 2);
+                html +=
+                    `<text x="${p.x}" y="${p.y+4}" fill="${isDead?'#6a4a4a':'#f0e0d0'}" font-size="${isDead?7:8}" text-anchor="middle">${label}</text>`;
+                if (layers.length > 0 && !isDead && !isFr) {
+                    html +=
+                        `<text x="${p.x}" y="${p.y-14}" fill="#7aaa7a" font-size="5" text-anchor="middle">L${layers.join('')}</text>`;
+                }
+                if (isFr) {
+                    html +=
+                        `<text x="${p.x}" y="${p.y-14}" fill="#5a8a5a" font-size="5" text-anchor="middle">🤝</text>`;
+                }
+                if (isMy) {
+                    html +=
+                        `<text x="${p.x}" y="${p.y-14}" fill="#dbb48c" font-size="5" text-anchor="middle">⭐</text>`;
+                }
+            });
+            svg.innerHTML = html;
+            relationCount.textContent = state.relations.length + ' 条连线';
+        }
+
+        function renderVote() {
+            const allChars = [...CHARACTERS];
+            voteGrid.innerHTML = allChars.map(ch => {
+                const isMe = isMyChar(ch.id);
+                const isFr = isFriend(ch.id);
+                const label = isMe ? '⭐ 我' : (isFr ? '🤝 朋友' : 'NPC');
+                const sel = state.voteTarget === ch.id ? 'selected' : '';
+                return `<div class="vote-card ${sel}" data-id="${ch.id}">
+                        <span class="v-avatar">${ch.emoji}</span>
+                        <span class="v-name">${ch.name}</span>
+                        <span class="v-title">${label}</span>
+                    </div>`;
+            }).join('');
+            voteGrid.querySelectorAll('.vote-card').forEach(el => {
+                el.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    if (state.voteTarget === id) {
+                        state.voteTarget = null;
+                    } else {
+                        state.voteTarget = id;
+                    }
+                    renderVote();
+                });
+            });
+        }
+
+        function renderFriendList() {
+            if (state.friendIds.length === 0) {
+                friendList.innerHTML =
+                    `<div style="grid-column:1/-1;text-align:center;color:#5a5a5a;font-size:0.85rem;padding:12px;">还没有标记朋友，点击「标记朋友」添加</div>`;
+                return;
+            }
+            const friends = state.friendIds.map(id => CHARACTERS.find(c => c.id === id)).filter(Boolean);
+            friendList.innerHTML = friends.map(ch => `
                     <div class="char-card" style="cursor:default;border-color:#3a5a3a;">
                         <span class="avatar">${ch.emoji}</span>
                         <span class="name">${ch.name}</span>
                         <span class="sub" style="color:#5a8a5a;">🤝 朋友 · 口述</span>
                     </div>
                 `).join('');
-            }
+        }
 
-            function renderRoleStatus() {
-                const my = getMyChar();
-                if (!my) { roleStatusGrid.innerHTML = ''; return; }
-                const all = CHARACTERS;
-                roleStatusGrid.innerHTML = all.map(ch => {
-                    const isMy = isMyChar(ch.id);
-                    const isFr = isFriend(ch.id);
-                    const layers = getUnlockedLayers(ch.id);
-                    let status = '';
-                    let badge = '';
-                    if (isMy) {
-                        status = '🟧 我的';
-                        badge = `<span class="me-tag">✅全</span>`;
-                    } else if (isFr) {
-                        status = '🟩 朋友';
-                        badge = `<span class="friend-tag">口述</span>`;
-                    } else {
-                        status = layers.length > 0 ? `✅ L${layers.join('')}` : '⬜ NPC';
-                        badge = layers.length > 0 ?
-                            `<span style="background:#2a7a3a;padding:1px 8px;border-radius:40px;font-size:0.5rem;color:#fff;">${layers.length}/3</span>` :
-                            `<span class="npc-tag">待解锁</span>`;
-                    }
-                    return `<div class="char-card" style="cursor:default;padding:8px 6px;border-color:${isMy?'#b28264':isFr?'#3a5a3a':layers.length>0?'#3a5a3a':'#3a2a2a'};opacity:${isMy||isFr||layers.length>0?1:0.6};">
+        function renderRoleStatus() {
+            const my = getMyChar();
+            if (!my) { roleStatusGrid.innerHTML = ''; return; }
+            const all = CHARACTERS;
+            roleStatusGrid.innerHTML = all.map(ch => {
+                const isMy = isMyChar(ch.id);
+                const isFr = isFriend(ch.id);
+                const layers = getUnlockedLayers(ch.id);
+                let status = '';
+                let badge = '';
+                if (isMy) {
+                    status = '🟧 我的';
+                    badge = `<span class="me-tag">✅全</span>`;
+                } else if (isFr) {
+                    status = '🟩 朋友';
+                    badge = `<span class="friend-tag">口述</span>`;
+                } else {
+                    status = layers.length > 0 ? `✅ L${layers.join('')}` : '⬜ NPC';
+                    badge = layers.length > 0 ?
+                        `<span style="background:#2a7a3a;padding:1px 8px;border-radius:40px;font-size:0.5rem;color:#fff;">${layers.length}/3</span>` :
+                        `<span class="npc-tag">待解锁</span>`;
+                }
+                return `<div class="char-card" style="cursor:default;padding:8px 6px;border-color:${isMy?'#b28264':isFr?'#3a5a3a':layers.length>0?'#3a5a3a':'#3a2a2a'};opacity:${isMy||isFr||layers.length>0?1:0.6};">
                         <span class="avatar" style="font-size:1.6rem;">${ch.emoji}</span>
                         <span class="name" style="font-size:0.8rem;">${ch.name}</span>
                         <span class="sub" style="font-size:0.55rem;">${status}</span>
                         <div style="margin-top:2px;">${badge}</div>
                     </div>`;
-                }).join('');
-            }
+            }).join('');
+        }
 
-            function renderMySecret() {
-                const my = getMyChar();
-                if (!my) { mySecretContent.textContent = '请先选择角色'; return; }
+        function renderMySecret() {
+            const my = getMyChar();
+            if (!my) { mySecretContent.textContent = '请先选择角色'; return; }
 
-                const fullStory = `${my.layer1}\n\n${'═'.repeat(30)}\n\n${my.layer2}\n\n${'═'.repeat(30)}\n\n${my.layer3}`;
-                const displayHtml = fullStory.replace(/\n/g, '<br>');
+            const fullStory = `${my.layer1}\n\n${'═'.repeat(30)}\n\n${my.layer2}\n\n${'═'.repeat(30)}\n\n${my.layer3}`;
+            const displayHtml = fullStory.replace(/\n/g, '<br>');
 
-                mySecretContent.innerHTML = `
+            mySecretContent.innerHTML = `
                     <div style="margin-bottom:4px;font-size:0.7rem;color:#b6967e;">
                         ${my.emoji} ${my.name} · ${my.title}
                         ${my.isMurderer ? '⚠️ 嫌疑人' : ''}
@@ -902,224 +1197,104 @@
                     </div>
                 `;
 
-                const npcList = getNPCList();
-                const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
-                stepCounter.textContent = `NPC ${unlockedNpc} / ${npcList.length}`;
-                playerNameDisplay.textContent = `👤 ${my.name} ✅`;
+            const npcList = getNPCList();
+            const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
+            stepCounter.textContent = `NPC ${unlockedNpc} / ${npcList.length}`;
+            playerNameDisplay.textContent = `👤 ${my.name} ✅`;
+        }
+
+        function triggerNpcStory() {
+            const sceneStories = NPC_STORIES.find(s => s.scene === state.sceneIndex);
+            if (!sceneStories) {
+                addLog('💬 暂无新的NPC故事', 'system');
+                return;
             }
-
-            function renderKeywords() {
-                const targetableIds = getNPCList().map(c => c.id);
-                const relevantKeywords = KEYWORDS.filter(kw => {
-                    const mapping = KEYWORD_MAP[kw];
-                    if (mapping.isGlobal) return true;
-                    return targetableIds.includes(mapping.targetId);
-                });
-
-                keywordPool.innerHTML = relevantKeywords.map(kw => {
-                    const used = state.keywordsUsed.includes(kw);
-                    return `<span class="keyword-tag ${used?'used':''}" data-keyword="${kw}">${kw}</span>`;
-                }).join('');
-                document.querySelectorAll('.keyword-tag:not(.used)').forEach(el => {
-                    el.addEventListener('click', function() {
-                        this.classList.toggle('active');
-                    });
-                });
+            const stories = sceneStories.stories;
+            const available = stories.filter((_, i) => i >= state.npcStoryIndex);
+            if (available.length === 0) {
+                addLog('💬 本幕NPC故事已讲完', 'system');
+                return;
             }
-
-            function getSelectedKeyword() {
-                const active = keywordPool.querySelectorAll('.keyword-tag.active:not(.used)');
-                return active.length > 0 ? active[0].dataset.keyword : null;
-            }
-
-            function renderTargets() {
-                const targets = getNPCList();
-                targetSelector.innerHTML = targets.map(ch => {
-                    const layers = getUnlockedLayers(ch.id);
-                    return `<button class="btn btn-sm btn-secondary target-btn" data-id="${ch.id}">${ch.emoji} ${ch.name} L${layers.length}/3</button>`;
-                }).join('');
-                if (targets.length === 0) {
-                    targetSelector.innerHTML =
-                        `<div style="color:#5a5a5a;font-size:0.8rem;padding:4px;">所有角色都是朋友，无需盘问</div>`;
-                }
-                const btns = targetSelector.querySelectorAll('.target-btn');
-                if (btns.length) btns[0]?.classList.add('btn-gold');
-                btns.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        btns.forEach(b => b.classList.remove('btn-gold'));
-                        this.classList.add('btn-gold');
-                    });
-                });
-            }
-
-            function getSelectedTarget() {
-                const active = targetSelector.querySelector('.btn-gold');
-                return active ? active.dataset.id : null;
-            }
-
-            function tryUnlockNPC(keyword, targetId) {
-                if (!keyword || state.keywordsUsed.includes(keyword)) return null;
-                if (isMyChar(targetId)) return { type: 'my', msg: '这是你自己的角色，已全部解锁' };
-                if (isFriend(targetId)) return { type: 'friend', msg: '这是朋友角色，故事由朋友口述' };
-
-                const mapping = KEYWORD_MAP[keyword];
-                if (!mapping) return null;
-
-                if (mapping.isGlobal) {
-                    if (state.unlockedGlobal) return null;
-                    state.unlockedGlobal = true;
-                    state.keywordsUsed.push(keyword);
-                    return { type: 'global', text: mapping.text };
-                }
-
-                if (mapping.targetId === targetId) {
-                    const char = CHARACTERS.find(c => c.id === targetId);
-                    if (!char) return null;
-                    const currentLayers = getUnlockedLayers(targetId);
-                    const nextLayer = mapping.layer || 2;
-                    if (currentLayers.includes(nextLayer)) {
-                        return { type: 'already', msg: `「${char.name}」的第${nextLayer}层已解锁` };
-                    }
-                    if (nextLayer === 3 && !currentLayers.includes(2)) {
-                        return { type: 'prereq', msg: `需要先解锁「${char.name}」的第2层` };
-                    }
-                    if (!state.unlockedLayers[targetId]) state.unlockedLayers[targetId] = [];
-                    state.unlockedLayers[targetId].push(nextLayer);
-                    state.keywordsUsed.push(keyword);
-                    let layerText = '';
-                    if (nextLayer === 2) layerText = char.layer2;
-                    else if (nextLayer === 3) layerText = char.layer3;
-                    return { type: 'layer', charId: targetId, layer: nextLayer, text: layerText };
-                }
-
-                if (mapping.targetId) {
-                    const expectedChar = CHARACTERS.find(c => c.id === mapping.targetId);
-                    return { type: 'wrong', msg: `「${keyword}」是 ${expectedChar?.name} 的关键词` };
-                }
-                return null;
-            }
-
-            function addRelation(charId) {
-                if (!state.relations.some(r => r.a === charId && r.b === 'cheng')) {
-                    state.relations.push({ a: charId, b: 'cheng', label: charId });
-                    renderRelation();
-                }
-            }
-
-            function renderRelation() {
-                const svg = relationSvg;
-                const w = 400,
-                    h = 200;
-                const pos = {
-                    mei: { x: 60, y: 70 },
-                    bai: { x: 150, y: 30 },
-                    shen: { x: 250, y: 30 },
-                    gu: { x: 60, y: 150 },
-                    qiao: { x: 150, y: 180 },
-                    cheng: { x: 340, y: 100 }
-                };
-                const names = Object.fromEntries(CHARACTERS.map(c => [c.id, c.name]));
-                names.cheng = '程玉声';
-                let html = `<rect width="${w}" height="${h}" fill="#0e0a0c" rx="16" />`;
-                state.relations.forEach(r => {
-                    const p1 = pos[r.a],
-                        p2 = pos[r.b];
-                    if (p1 && p2) {
-                        const isRed = r.a === 'mei' || r.b === 'mei';
-                        html +=
-                            `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${isRed?'#b23a3a':'#b28264'}" stroke-width="${isRed?'3':'1.5'}" opacity="0.6" />`;
-                    }
-                });
-                Object.entries(pos).forEach(([id, p]) => {
-                    const name = names[id] || id;
-                    const isMy = isMyChar(id);
-                    const isFr = isFriend(id);
-                    const layers = getUnlockedLayers(id);
-                    const isDead = id === 'cheng';
-                    let fill = '#2a1d1a';
-                    if (isDead) fill = '#1a0a0a';
-                    else if (isMy) fill = '#6d3f30';
-                    else if (isFr) fill = '#2a4a3a';
-                    else if (layers.length > 0) fill = '#2a3a2a';
-                    let stroke = '#5a4a3a';
-                    if (isDead) stroke = '#5a2a2a';
-                    else if (isMy) stroke = '#c9a77b';
-                    else if (isFr) stroke = '#5a8a6a';
-                    else if (layers.length > 0) stroke = '#5a7a5a';
-                    html +=
-                        `<circle cx="${p.x}" cy="${p.y}" r="${isDead?10:14}" fill="${fill}" stroke="${stroke}" stroke-width="2" />`;
-                    const label = isDead ? '程' : name.slice(0, 2);
-                    html +=
-                        `<text x="${p.x}" y="${p.y+4}" fill="${isDead?'#6a4a4a':'#f0e0d0'}" font-size="${isDead?7:8}" text-anchor="middle">${label}</text>`;
-                    if (layers.length > 0 && !isDead && !isFr) {
-                        html +=
-                            `<text x="${p.x}" y="${p.y-14}" fill="#7aaa7a" font-size="5" text-anchor="middle">L${layers.join('')}</text>`;
-                    }
-                    if (isFr) {
-                        html +=
-                            `<text x="${p.x}" y="${p.y-14}" fill="#5a8a5a" font-size="5" text-anchor="middle">🤝</text>`;
-                    }
-                    if (isMy) {
-                        html +=
-                            `<text x="${p.x}" y="${p.y-14}" fill="#dbb48c" font-size="5" text-anchor="middle">⭐</text>`;
-                    }
-                });
-                svg.innerHTML = html;
-                relationCount.textContent = state.relations.length + ' 条连线';
-            }
-
-            function triggerNpcStory() {
-                const sceneStories = NPC_STORIES.find(s => s.scene === state.sceneIndex);
-                if (!sceneStories) {
-                    addLog('💬 暂无新的NPC故事', 'system');
-                    return;
-                }
-                const stories = sceneStories.stories;
-                const available = stories.filter((_, i) => i >= state.npcStoryIndex);
-                if (available.length === 0) {
-                    addLog('💬 本幕NPC故事已讲完', 'system');
-                    return;
-                }
-                const story = available[0];
-                const idx = stories.indexOf(story);
-                state.npcStoryIndex = idx + 1;
-                const speaker = story.split('】')[0].replace('💬 【', '') + '】';
-                const content = story.split('】')[1] || story;
-                npcSpeechContainer.innerHTML = `
+            const story = available[0];
+            const idx = stories.indexOf(story);
+            state.npcStoryIndex = idx + 1;
+            const speaker = story.split('】')[0].replace('💬 【', '') + '】';
+            const content = story.split('】')[1] || story;
+            npcSpeechContainer.innerHTML = `
                     <div class="npc-speech fade-in">
                         <div class="speaker">${speaker}</div>
                         <div>${content}</div>
                         <div style="margin-top:4px;font-size:0.7rem;color:#5a8a8a;">🎭 NPC · 自动分享</div>
                     </div>
                 `;
-                addLog(story, 'system', true);
-                setTimeout(() => {
-                    const el = npcSpeechContainer.querySelector('.npc-speech');
-                    if (el) el.style.opacity = '0.6';
-                }, 8000);
-            }
+            addLog(story, 'system', true);
+            setTimeout(() => {
+                const el = npcSpeechContainer.querySelector('.npc-speech');
+                if (el) el.style.opacity = '0.6';
+            }, 8000);
+        }
 
-            function showEvidence() {
-                let html = `<div style="margin-bottom:10px;color:#b6967e;font-size:0.8rem;">📌 公共证据 · 所有人可见</div>`;
-                EVIDENCES.forEach(ev => {
-                    html += `
+        function submitVote() {
+            if (!state.voteTarget) { alert('请选择你要投票的凶手'); return; }
+            if (state.hasVoted) { alert('你已经投过票了'); return; }
+            const char = CHARACTERS.find(c => c.id === state.voteTarget);
+            if (!char) return;
+            state.hasVoted = true;
+            addLog(`🗳️ 你投票给了 ${char.name}`, 'player');
+            showModal('🗳️ 投票确认', `
+                    <p style="color:#f0d5c0;">你投给了 <strong>${char.emoji} ${char.name}</strong></p>
+                    <p style="color:#b6967e;font-size:0.85rem;margin-top:8px;">投票已记录。现在点击「揭晓真相」查看完整真相。</p>
+                `);
+            submitVoteBtn.textContent = '✅ 已投票';
+            submitVoteBtn.disabled = true;
+            phaseBadge.textContent = '🗳️ 已投票';
+            phaseBadge.classList.add('vote');
+            document.getElementById('truthSection').classList.remove('hidden');
+        }
+
+        function revealTruth() {
+            if (!state.hasVoted) {
+                alert('请先投票再揭晓真相');
+                return;
+            }
+            if (state.truthRevealed) return;
+            state.truthRevealed = true;
+            const truthHtml = GLOBAL_TRUTH.body.replace(/\n/g, '<br>');
+            truthContent.innerHTML = `
+                    <div class="truth-section">
+                        <div class="truth-title">${GLOBAL_TRUTH.title}</div>
+                        <div class="truth-body">${truthHtml}</div>
+                    </div>
+                `;
+            revealTruthBtn.textContent = '✅ 已揭晓';
+            revealTruthBtn.disabled = true;
+            phaseBadge.textContent = '🕯️ 真相已揭晓';
+            phaseBadge.className = 'phase-badge truth';
+            addLog('🕯️ 真相已揭晓！', 'player');
+            document.getElementById('truthSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showEvidence() {
+            let html = `<div style="margin-bottom:10px;color:#b6967e;font-size:0.8rem;">📌 公共证据 · 所有人可见</div>`;
+            EVIDENCES.forEach(ev => {
+                html += `
                         <div class="evidence-card">
                             <div class="ev-title">${ev.title}</div>
                             <div class="ev-body">${ev.body}</div>
                         </div>
                     `;
-                });
-                html += `<div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                    💡 搜证完成。你的故事已全部解锁，盘问NPC获取更多信息。
+            });
+            html += `<div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
+                    💡 搜证完成。盘问NPC获取碎片故事，然后投票找出凶手。
                 </div>`;
-                showModal('📜 搜证', html);
-            }
+            showModal('📜 搜证', html);
+        }
 
-            function showShareGuide() {
-                const my = getMyChar();
-                const npcList = getNPCList();
-                const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
-                let html = `
+        function showShareGuide() {
+            const my = getMyChar();
+            const npcList = getNPCList();
+            const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
+            let html = `
                     <div style="color:#f7d9c0;font-size:1rem;margin-bottom:10px;">💬 连麦分享指引</div>
                     <div style="padding:10px;background:#0d080a;border-radius:12px;border-left:3px solid #7a5a4a;margin-bottom:10px;">
                         <p style="color:#dacfc0;font-size:0.9rem;line-height:1.8;">
@@ -1139,181 +1314,189 @@
                         </p>
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#1a2a1a;border-radius:12px;border:1px solid #3a5a3a;">
-                        <p style="color:#a0d0a0;font-size:0.85rem;">📌 轮流分享，你的故事已全部解锁，可以决定说多少</p>
+                        <p style="color:#a0d0a0;font-size:0.85rem;">📌 轮流分享，然后投票选出凶手</p>
                     </div>
                 `;
-                showModal('💬 分享指引', html);
+            showModal('💬 分享指引', html);
+        }
+
+        function handleAsk() {
+            const target = getSelectedTarget();
+            const keyword = getSelectedKeyword();
+            if (!target) { alert('请选择NPC对象'); return; }
+            if (!keyword) { alert('请选择关键词'); return; }
+            if (state.keywordsUsed.includes(keyword)) {
+                addLog(`⚠️ 关键词「${keyword}」已使用`, 'system');
+                return;
             }
-
-            function handleAsk() {
-                const target = getSelectedTarget();
-                const keyword = getSelectedKeyword();
-                if (!target) { alert('请选择NPC对象'); return; }
-                if (!keyword) { alert('请选择关键词'); return; }
-                if (state.keywordsUsed.includes(keyword)) {
-                    addLog(`⚠️ 关键词「${keyword}」已使用`, 'system');
-                    return;
-                }
-
-                const result = tryUnlockNPC(keyword, target);
-                if (!result) {
-                    addLog(`❓ 盘问 [${keyword}] 无匹配`, 'system');
-                    document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
-                    return;
-                }
-
-                if (result.type === 'my' || result.type === 'friend' || result.type === 'wrong' || result.type === 'already' ||
-                    result.type === 'prereq') {
-                    addLog(`⚠️ ${result.msg}`, 'system');
-                    document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
-                    return;
-                }
-
-                if (result.type === 'layer') {
-                    const char = CHARACTERS.find(c => c.id === result.charId);
-                    addLog(`🔓 NPC ${char.name} 的第${result.layer}层已解锁！`, 'player');
-                    addRelation(result.charId);
-                    const layerName = result.layer === 2 ? '深层秘密' : '完整真相';
-                    showModal(`🔓 ${char.name} · ${layerName}`, `
+            const result = tryUnlockNPC(keyword, target);
+            if (!result) {
+                addLog(`❓ 盘问 [${keyword}] 无匹配`, 'system');
+                document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
+                return;
+            }
+            if (result.type === 'my' || result.type === 'friend' || result.type === 'wrong' || result.type === 'already' ||
+                result.type === 'prereq') {
+                addLog(`⚠️ ${result.msg}`, 'system');
+                document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
+                return;
+            }
+            if (result.type === 'layer') {
+                const char = CHARACTERS.find(c => c.id === result.charId);
+                addLog(`🔓 NPC ${char.name} 的第${result.layer}层已解锁！`, 'player');
+                addRelation(result.charId);
+                const layerName = result.layer === 2 ? '深层秘密' : '完整故事';
+                showModal(`🔓 ${char.name} · ${layerName}`, `
                         <div style="color:#f0d5c0;white-space:pre-wrap;line-height:1.8;">${result.text}</div>
                         <div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
                             💡 这是NPC的${layerName}。你可以在连麦中决定是否分享。
                         </div>
                     `);
-                    if (result.layer === 2) {
-                        setTimeout(() => triggerNpcStory(), 500);
-                    }
-                }
-
-                if (result.type === 'global') {
-                    addLog(`🟢 全局真相解锁！`, 'player');
-                    showModal('🟢 全局真相', `
-                        <div style="color:#f0d5c0;white-space:pre-wrap;line-height:1.8;">${result.text}</div>
-                        <div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                            💡 核心真相，在连麦中分享给大家
-                        </div>
-                    `);
-                }
-
-                renderKeywords();
-                renderTargets();
-                renderCharSelection();
-                renderFriendList();
-                renderRoleStatus();
-                renderMySecret();
-                renderRelation();
-                updateUI();
-
-                const npcList = getNPCList();
-                const allNpcL2 = npcList.every(c => getUnlockedLayers(c.id).includes(2));
-                if (allNpcL2 && !state.unlockedGlobal) {
-                    addLog('💡 所有NPC的第2层已解锁！用「夜明珠」解锁全局真相。', 'system');
+                if (result.layer === 2) {
+                    setTimeout(() => triggerNpcStory(), 500);
                 }
             }
+            renderKeywords();
+            renderTargets();
+            renderCharSelection();
+            renderFriendList();
+            renderRoleStatus();
+            renderMySecret();
+            renderRelation();
+            updateUI();
+            const npcList = getNPCList();
+            const allNpcL2 = npcList.every(c => getUnlockedLayers(c.id).includes(2));
+            if (allNpcL2) {
+                addLog('💡 所有NPC的第2层已解锁！可以开始投票了。', 'system');
+            }
+        }
 
-            function markFriend() {
-                const my = getMyChar();
-                if (!my) { alert('请先选择「我的角色」'); return; }
-                const others = CHARACTERS.filter(c => c.id !== state.myRoleId);
-                let html = `
+        function markFriend() {
+            const my = getMyChar();
+            if (!my) { alert('请先选择「我的角色」'); return; }
+            const others = CHARACTERS.filter(c => c.id !== state.myRoleId);
+            let html = `
                     <div style="margin-bottom:10px;color:#b6967e;font-size:0.9rem;">选择标记为「朋友」的角色</div>
                     <div style="color:#a0a0a0;font-size:0.8rem;margin-bottom:8px;">朋友的故事由朋友本人口述，页面上不显示</div>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
                 `;
-                others.forEach(ch => {
-                    const isFr = isFriend(ch.id);
-                    html += `
+            others.forEach(ch => {
+                const isFr = isFriend(ch.id);
+                html += `
                         <button class="btn ${isFr ? 'btn-green' : 'btn-secondary'} btn-sm" data-id="${ch.id}" style="flex:0 1 auto;">
                             ${ch.emoji} ${ch.name} ${isFr ? '✅' : ''}
                         </button>
                     `;
-                });
-                html += `</div>
+            });
+            html += `</div>
                     <div style="margin-top:10px;color:#b6967e;font-size:0.8rem;">💡 点击切换标记状态</div>
                 `;
-                showModal('🤝 标记朋友', html);
-                setTimeout(() => {
-                    document.querySelectorAll('#modalBox .btn[data-id]').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = this.dataset.id;
-                            const idx = state.friendIds.indexOf(id);
-                            if (idx > -1) state.friendIds.splice(idx, 1);
-                            else state.friendIds.push(id);
-                            markFriend();
-                            renderCharSelection();
-                            renderFriendList();
-                            renderRoleStatus();
-                            renderMySecret();
-                            renderRelation();
-                            renderTargets();
-                            renderKeywords();
-                            addLog(`🤝 朋友列表已更新`, 'system');
-                        });
+            showModal('🤝 标记朋友', html);
+            setTimeout(() => {
+                document.querySelectorAll('#modalBox .btn[data-id]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        const idx = state.friendIds.indexOf(id);
+                        if (idx > -1) state.friendIds.splice(idx, 1);
+                        else state.friendIds.push(id);
+                        markFriend();
+                        renderCharSelection();
+                        renderFriendList();
+                        renderRoleStatus();
+                        renderMySecret();
+                        renderRelation();
+                        renderTargets();
+                        renderKeywords();
+                        renderVote();
+                        addLog(`🤝 朋友列表已更新`, 'system');
                     });
-                }, 100);
+                });
+            }, 100);
+        }
+
+        function updateUI() {
+            const scene = SCENES[state.sceneIndex] || SCENES[0];
+            sceneTitle.textContent = scene.title;
+            sceneDesc.textContent = scene.desc;
+            scenePhase.textContent = `第${state.sceneIndex+1}幕`;
+            if (state.truthRevealed) {
+                phaseBadge.textContent = '🕯️ 真相已揭晓';
+                phaseBadge.className = 'phase-badge truth';
+            } else if (state.hasVoted) {
+                phaseBadge.textContent = '🗳️ 已投票';
+                phaseBadge.className = 'phase-badge vote';
+            } else if (state.sceneIndex >= 2) {
+                phaseBadge.textContent = '🗳️ 投票阶段';
+                phaseBadge.className = 'phase-badge vote';
+            } else {
+                phaseBadge.textContent = '📌 搜证阶段';
+                phaseBadge.className = 'phase-badge';
             }
+            if (state.sceneIndex >= 2) {
+                document.getElementById('voteSection').classList.remove('hidden');
+            } else {
+                document.getElementById('voteSection').classList.add('hidden');
+            }
+            if (state.truthRevealed || state.hasVoted) {
+                document.getElementById('truthSection').classList.remove('hidden');
+            } else {
+                document.getElementById('truthSection').classList.add('hidden');
+            }
+            if (state.sceneIndex >= 2) endingSection.classList.remove('hidden');
+            else endingSection.classList.add('hidden');
+            nextSceneBtn.textContent = state.sceneIndex >= 2 ? '🔄 重演真相' : '▶ 推进剧情';
+            const my = getMyChar();
+            const npcList = getNPCList();
+            const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
+            if (!my) {
+                phaseTip.innerHTML =
+                `<strong>📖 请先选择你的角色</strong><br>点击角色头像选择，然后点击「确认我的角色」开始游戏。`;
+            } else if (state.truthRevealed) {
+                phaseTip.innerHTML = `<strong>🕯️ 真相已揭晓</strong><br>查看完整真相，然后选择结局。`;
+            } else if (state.hasVoted) {
+                phaseTip.innerHTML =
+                    `<strong>🗳️ 你已投票</strong><br>点击「揭晓真相」查看完整故事和凶手真相。`;
+            } else if (state.sceneIndex >= 2) {
+                phaseTip.innerHTML = `<strong>🗳️ 投票阶段</strong><br>根据你掌握的所有线索，投票选出你认为的凶手。`;
+            } else {
+                phaseTip.innerHTML =
+                    `<strong>✅ 你的完整故事已解锁</strong><br>仔细阅读你的全部故事。盘问NPC获取碎片线索，然后投票找出凶手。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
+            }
+        }
 
-            function updateUI() {
-                const scene = SCENES[state.sceneIndex] || SCENES[0];
-                sceneTitle.textContent = scene.title;
-                sceneDesc.textContent = scene.desc;
-                scenePhase.textContent = `第${state.sceneIndex+1}幕`;
+        function checkSceneProgress() {
+            const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
+            const s = state.sceneIndex;
+            if (s === 0 && totalLayers >= 2) return true;
+            if (s === 1 && totalLayers >= 6) return true;
+            if (s === 2) return true;
+            return false;
+        }
 
-                const phaseNames = ['📌 搜证', '🔍 盘问NPC', '💬 分享', '🎬 结局'];
-                phaseBadge.textContent = phaseNames[Math.min(state.sceneIndex, 3)];
+        function showModal(title, body) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = body;
+            modalOverlay.classList.remove('hidden');
+        }
 
-                if (state.sceneIndex >= 2) endingSection.classList.remove('hidden');
-                else endingSection.classList.add('hidden');
-                nextSceneBtn.textContent = state.sceneIndex >= 2 ? '🔄 重演真相' : '▶ 推进剧情';
-
-                const my = getMyChar();
-                const npcList = getNPCList();
-                const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
-
-                if (!my) {
-                    phaseTip.innerHTML = `<strong>📖 请先选择你的角色</strong><br>点击角色头像选择，然后点击「确认我的角色」开始游戏。`;
-                } else {
-                    phaseTip.innerHTML =
-                        `<strong>✅ 你的完整故事已解锁</strong><br>仔细阅读你的全部故事。朋友的角色由他们自己口述。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
+        function nextScene() {
+            const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
+            if (state.sceneIndex < 2) {
+                if (!checkSceneProgress()) {
+                    alert(`需要更多NPC解锁 (当前 ${totalLayers}层 / 需要 ${state.sceneIndex===0?2:6}层)`);
+                    return;
                 }
-            }
-
-            function checkSceneProgress() {
-                const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
-                const s = state.sceneIndex;
-                if (s === 0 && totalLayers >= 2) return true;
-                if (s === 1 && totalLayers >= 6) return true;
-                if (s === 2 && totalLayers >= 10) return true;
-                return false;
-            }
-
-            function showModal(title, body) {
-                modalTitle.textContent = title;
-                modalBody.innerHTML = body;
-                modalOverlay.classList.remove('hidden');
-            }
-
-            function nextScene() {
-                const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
-                if (state.sceneIndex < 2) {
-                    if (!checkSceneProgress()) {
-                        alert(`需要更多NPC解锁 (当前 ${totalLayers}层 / 需要 ${state.sceneIndex===0?2:6}层)`);
-                        return;
-                    }
-                    state.sceneIndex++;
-                    state.npcStoryIndex = 0;
-                    addLog(`📌 进入 ${SCENES[state.sceneIndex].title}`, 'system');
-                    setTimeout(() => triggerNpcStory(), 300);
-                    if (state.sceneIndex === 2) {
-                        addLog('🕯️ 最终幕：夜明珠·归处', 'system');
-                        endingSection.classList.remove('hidden');
-                        setTimeout(() => triggerNpcStory(), 1000);
-                        setTimeout(() => triggerNpcStory(), 3000);
-                    }
-                    updateUI();
-                    renderRelation();
-                } else {
-                    showModal('🌙 夜明珠 · 戏楼诡影', `
+                state.sceneIndex++;
+                state.npcStoryIndex = 0;
+                addLog(`📌 进入 ${SCENES[state.sceneIndex].title}`, 'system');
+                setTimeout(() => triggerNpcStory(), 300);
+                if (state.sceneIndex === 2) {
+                    addLog('🗳️ 进入投票阶段！选出你心中的凶手。', 'system');
+                }
+                updateUI();
+                renderRelation();
+            } else {
+                showModal('🌙 夜明珠 · 戏楼诡影', `
                         <p style="color:#f7d9c0;">三重反转：</p>
                         <p>1️⃣ 银簪不是致命伤，掐痕才是——梅寒笙掐死了他。</p>
                         <p>2️⃣ 程玉声是自杀。他用自己的死换所有人自由。</p>
@@ -1323,15 +1506,16 @@
                         <br>
                         <p style="color:#f7d9c0;font-size:0.9rem;">请选择结局——</p>
                     `);
-                }
             }
+        }
 
-            function chooseEnding(type) {
-                if (state.endingChosen) return;
-                state.endingChosen = type;
-                const isReset = type === 'reset';
-                addLog(isReset ? '🔴 沉默结局' : '🕯️ 救赎结局', 'player');
-                showModal(isReset ? '🔴 沉默 · 落幕' : '🕯️ 救赎 · 续梦', isReset ? `
+        function chooseEnding(type) {
+            if (state.endingChosen) return;
+            if (!state.truthRevealed) { alert('请先「揭晓真相」再选择结局'); return; }
+            state.endingChosen = type;
+            const isReset = type === 'reset';
+            addLog(isReset ? '🔴 沉默结局' : '🕯️ 救赎结局', 'player');
+            showModal(isReset ? '🔴 沉默 · 落幕' : '🕯️ 救赎 · 续梦', isReset ? `
                     <p>众人决定隐瞒真相，让程玉声以「舞台意外」下葬。</p>
                     <p>梅寒笙终身愧疚，每天在坟前唱戏。</p>
                     <p>十年后戏楼烧毁，夜明珠不知下落。</p>
@@ -1343,94 +1527,113 @@
                     <p>乔知秋背叛日军，留在戏楼当琴师。</p>
                     <p style="color:#b6967e;margin-top:12px;">「原来姹紫嫣红开遍，似这般都付与断井颓垣。」</p>
                 `);
-                endingResetBtn.disabled = true;
-                endingButterflyBtn.disabled = true;
-            }
+            endingResetBtn.disabled = true;
+            endingButterflyBtn.disabled = true;
+        }
 
-            function confirmMyRole() {
-                if (!state.myRoleId) { alert('请先选择「我的角色」'); return; }
-                if (!state.unlockedLayers[state.myRoleId]) state.unlockedLayers[state.myRoleId] = [];
-                [1, 2, 3].forEach(layer => {
-                    if (!state.unlockedLayers[state.myRoleId].includes(layer)) {
-                        state.unlockedLayers[state.myRoleId].push(layer);
-                    }
-                });
-                stepSelect.classList.add('hidden');
-                gamePanel.classList.remove('hidden');
-                renderMySecret();
-                renderFriendList();
-                renderRoleStatus();
+        function confirmMyRole() {
+            if (!state.myRoleId) { alert('请先选择「我的角色」'); return; }
+            if (!state.unlockedLayers[state.myRoleId]) state.unlockedLayers[state.myRoleId] = [];
+            [1, 2, 3].forEach(layer => {
+                if (!state.unlockedLayers[state.myRoleId].includes(layer)) {
+                    state.unlockedLayers[state.myRoleId].push(layer);
+                }
+            });
+            stepSelect.classList.add('hidden');
+            gamePanel.classList.remove('hidden');
+            renderMySecret();
+            renderFriendList();
+            renderRoleStatus();
+            renderKeywords();
+            renderTargets();
+            renderRelation();
+            renderVote();
+            updateUI();
+            const my = getMyChar();
+            addLog(`🌙 你已扮演 ${my.name}，全部故事已解锁`, 'player');
+            addLog(`📖 请仔细阅读你的完整故事，然后盘问NPC获取更多线索`, 'player');
+            setTimeout(() => triggerNpcStory(), 500);
+        }
+
+        function resetGame() {
+            state.myRoleId = null;
+            state.friendIds = [];
+            state.sceneIndex = 0;
+            state.keywordsUsed = [];
+            state.unlockedLayers = {};
+            state.log = [];
+            state.relations = [];
+            state.endingChosen = null;
+            state.npcStoryIndex = 0;
+            state.voteTarget = null;
+            state.hasVoted = false;
+            state.truthRevealed = false;
+            gamePanel.classList.add('hidden');
+            stepSelect.classList.remove('hidden');
+            renderCharSelection();
+            confirmBtn.textContent = '✓ 确认我的角色';
+            endingResetBtn.disabled = false;
+            endingButterflyBtn.disabled = false;
+            endingSection.classList.add('hidden');
+            document.getElementById('voteSection').classList.add('hidden');
+            document.getElementById('truthSection').classList.add('hidden');
+            logArea.innerHTML = '';
+            npcSpeechContainer.innerHTML = '';
+            truthContent.innerHTML = '投票后点击「揭晓真相」查看完整故事和凶手真相。';
+            revealTruthBtn.textContent = '🕯️ 揭晓真相';
+            revealTruthBtn.disabled = false;
+            submitVoteBtn.textContent = '✅ 确认投票';
+            submitVoteBtn.disabled = false;
+            renderRelation();
+            updateUI();
+            playerNameDisplay.textContent = '👤 未选角色';
+            addLog('🔄 游戏已重置', 'system');
+        }
+
+        // ================================================================
+        // 启动游戏
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                renderCharSelection();
                 renderKeywords();
                 renderTargets();
                 renderRelation();
+                renderVote();
                 updateUI();
-                const my = getMyChar();
-                addLog(`🌙 你已扮演 ${my.name}，全部故事已解锁`, 'player');
-                addLog(`📖 请仔细阅读你的完整故事，然后准备在连麦中分享`, 'player');
-                setTimeout(() => triggerNpcStory(), 500);
-            }
-
-            function resetGame() {
-                state.myRoleId = null;
-                state.friendIds = [];
-                state.sceneIndex = 0;
-                state.keywordsUsed = [];
-                state.unlockedLayers = {};
-                state.unlockedGlobal = false;
-                state.log = [];
-                state.relations = [];
-                state.endingChosen = null;
-                state.npcStoryIndex = 0;
-                gamePanel.classList.add('hidden');
-                stepSelect.classList.remove('hidden');
-                renderCharSelection();
-                confirmBtn.textContent = '✓ 确认我的角色';
-                endingResetBtn.disabled = false;
-                endingButterflyBtn.disabled = false;
-                endingSection.classList.add('hidden');
-                logArea.innerHTML = '';
-                npcSpeechContainer.innerHTML = '';
-                renderRelation();
-                updateUI();
-                playerNameDisplay.textContent = '👤 未选角色';
-                addLog('🔄 游戏已重置', 'system');
-            }
-
-            function init() {
-                renderCharSelection();
-                renderKeywords();
-                renderTargets();
-                renderRelation();
-                updateUI();
-                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》最终版', 'system');
-                addLog('📖 选角后你的全部故事直接解锁，无需盘问', 'system');
+                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》最终统一版', 'system');
+                addLog('📖 选角后你的全部故事直接解锁，盘问NPC获取线索，然后投票', 'system');
 
                 confirmBtn.addEventListener('click', confirmMyRole);
                 markFriendBtn.addEventListener('click', markFriend);
-                resetSelBtn.addEventListener('click', () => {
+                resetSelBtn.addEventListener('click', function() {
                     state.myRoleId = null;
                     renderCharSelection();
                     confirmBtn.textContent = '✓ 确认我的角色';
                 });
                 askBtn.addEventListener('click', handleAsk);
                 nextSceneBtn.addEventListener('click', nextScene);
-                clearLogBtn.addEventListener('click', () => { state.log = [];
+                clearLogBtn.addEventListener('click', function() { state.log = [];
                     renderLog(); });
                 evidenceBtn.addEventListener('click', showEvidence);
                 shareBtn.addEventListener('click', showShareGuide);
                 npcStoryBtn.addEventListener('click', triggerNpcStory);
-                endingResetBtn.addEventListener('click', () => chooseEnding('reset'));
-                endingButterflyBtn.addEventListener('click', () => chooseEnding('butterfly'));
-                modalCloseBtn.addEventListener('click', () => modalOverlay.classList.add('hidden'));
-                modalOverlay.addEventListener('click', (e) => {
+                voteBtn.addEventListener('click', function() {
+                    document.getElementById('voteSection').scrollIntoView({ behavior: 'smooth' });
+                });
+                submitVoteBtn.addEventListener('click', submitVote);
+                revealTruthBtn.addEventListener('click', revealTruth);
+                endingResetBtn.addEventListener('click', function() { chooseEnding('reset'); });
+                endingButterflyBtn.addEventListener('click', function() { chooseEnding('butterfly'); });
+                modalCloseBtn.addEventListener('click', function() { modalOverlay.classList.add('hidden'); });
+                modalOverlay.addEventListener('click', function(e) {
                     if (e.target === modalOverlay) modalOverlay.classList.add('hidden');
                 });
-                document.addEventListener('keydown', (e) => {
+                document.addEventListener('keydown', function(e) {
                     if (e.key === 'r' && e.ctrlKey) { e.preventDefault(); if (confirm('重置游戏？')) resetGame(); }
                 });
-            }
-            init();
-        })();
+            }, 50);
+        });
     </script>
 </body>
 </html>
