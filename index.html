@@ -531,6 +531,23 @@
             background: #4a6a4a;
             border-color: #7aaa7a;
         }
+        .ask-counter {
+            display: inline-block;
+            background: #1a1a2a;
+            border: 1px solid #4a4a6a;
+            border-radius: 40px;
+            padding: 4px 18px;
+            font-size: 0.8rem;
+            color: #c0c0e0;
+        }
+        .ask-counter .num {
+            color: #f7d9c0;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .ask-counter .num.zero {
+            color: #d04a4a;
+        }
     </style>
 </head>
 <body>
@@ -539,7 +556,7 @@
         <h1>🌙 夜明珠 · 戏楼诡影</h1>
         <div class="subhead">
             <span>🎭 民国 · 1943</span>
-            <span>🗳️ 投票凶手版</span>
+            <span>🗳️ 2次盘问版</span>
             <span>⚡ 投票后揭晓真相</span>
         </div>
 
@@ -573,7 +590,7 @@
 
             <div class="phase-tip" id="phaseTip">
                 <strong>📖 你的全部故事已解锁</strong><br>
-                仔细阅读你的完整故事。盘问NPC获取更多碎片线索，然后投票找出凶手。
+                仔细阅读你的完整故事。你有 <strong>2次盘问机会</strong>，选择要盘问的NPC和关键词。
             </div>
 
             <div class="flex-row">
@@ -623,6 +640,9 @@
                 <div class="flex-between">
                     <span style="font-size:0.85rem;">🔍 盘问NPC · 选对象 + <strong>1个关键词</strong></span>
                     <span class="text-muted" id="askHint">解锁NPC碎片故事</span>
+                </div>
+                <div style="text-align:center; margin-bottom:8px;">
+                    <span class="ask-counter">🎯 剩余盘问次数：<span class="num" id="askCounterNum">2</span></span>
                 </div>
                 <div class="flex-row" style="justify-content:flex-start; gap:5px; flex-wrap:wrap;" id="targetSelector"></div>
                 <div style="margin: 6px 0;">
@@ -809,7 +829,7 @@
 
         const GLOBAL_TRUTH = {
             title: '🟢 真相 · 三重反转',
-            body: `【第一层反转 · 银簪不是致命伤】\n银簪偏离心脏两寸，真正致命的是颈部掐痕——梅寒笙掐死了程玉声。但程玉声在被掐之前，已经服下了慢性毒药。\n\n【第二层反转 · 程玉声是自杀】\n程玉声早就知道自己时日无多。他用自己的死，换所有人的自由。他让梅寒笙以为自己是凶手，让白露浓以为他负了她，让沈砚之以为他骗了他——但他骗了所有人，是为了让他们"恨他"，而不是"爱他"。\n\n【第三层反转 · 夜明珠的真相】\n夜明珠不在地下室——在程玉声心里。他说的"夜明珠还我"，是说"把我的唱腔，还给戏台"。他把夜明珠的藏处告诉了沈砚之，让军统护送去重庆。\n\n【凶手是谁？】\n梅寒笙是物理上的凶手（掐死了他）。\n程玉声是真正的"自杀者"——他用自己的死，换了所有人的自由。`
+            body: `【第一层反转 · 银簪不是致命伤】\n银簪偏离心脏两寸，真正致命的是颈部掐痕——梅寒笙掐死了程玉声。\n\n【第二层反转 · 程玉声是自杀】\n程玉声早就知道自己时日无多。他用自己的死，换所有人的自由。他骗了所有人，是为了让他们"恨他"，而不是"爱他"。\n\n【第三层反转 · 夜明珠的真相】\n夜明珠不在地下室——在程玉声心里。他说的"夜明珠还我"，是说"把我的唱腔，还给戏台"。\n\n【凶手是谁？】\n梅寒笙是物理上的凶手。程玉声是真正的"自杀者"——他用死换了所有人的自由。`
         };
 
         const SCENES = [
@@ -834,6 +854,8 @@
             voteTarget: null,
             hasVoted: false,
             truthRevealed: false,
+            askCount: 0,
+            maxAskCount: 2,
         };
 
         // ================================================================
@@ -880,6 +902,7 @@
         const voteBtn = $('voteBtn');
         const truthContent = $('truthContent');
         const revealTruthBtn = $('revealTruthBtn');
+        const askCounterNum = $('askCounterNum');
 
         function getMyChar() { return CHARACTERS.find(c => c.id === state.myRoleId); }
 
@@ -894,6 +917,19 @@
         function isNPC(id) { return !isMyChar(id) && !isFriend(id); }
 
         function getNPCList() { return CHARACTERS.filter(c => isNPC(c.id)); }
+
+        function updateAskCounter() {
+            const remaining = state.maxAskCount - state.askCount;
+            askCounterNum.textContent = remaining;
+            askCounterNum.className = 'num' + (remaining <= 0 ? ' zero' : '');
+            if (remaining <= 0) {
+                askBtn.disabled = true;
+                askBtn.textContent = '⛔ 次数已用完';
+            } else {
+                askBtn.disabled = false;
+                askBtn.textContent = '⚡ 盘问NPC';
+            }
+        }
 
         function addLog(msg, type = 'system', isNpc = false) {
             state.log.unshift({ msg, type, time: new Date().toLocaleTimeString(), isNpc });
@@ -1000,6 +1036,9 @@
         }
 
         function tryUnlockNPC(keyword, targetId) {
+            if (state.askCount >= state.maxAskCount) {
+                return { type: 'no_ask', msg: '你的盘问次数已用完！' };
+            }
             if (!keyword || state.keywordsUsed.includes(keyword)) return null;
             if (isMyChar(targetId)) return { type: 'my', msg: '这是你自己的角色，已全部解锁' };
             if (isFriend(targetId)) return { type: 'friend', msg: '这是朋友角色，故事由朋友口述' };
@@ -1021,6 +1060,7 @@
                 if (!state.unlockedLayers[targetId]) state.unlockedLayers[targetId] = [];
                 state.unlockedLayers[targetId].push(nextLayer);
                 state.keywordsUsed.push(keyword);
+                state.askCount++;
                 let layerText = '';
                 if (nextLayer === 2) layerText = char.layer2;
                 else if (nextLayer === 3) layerText = char.layer3;
@@ -1285,7 +1325,7 @@
                     `;
             });
             html += `<div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                    💡 搜证完成。盘问NPC获取碎片故事，然后投票找出凶手。
+                    💡 搜证完成。你有 <strong>2次盘问机会</strong>，选择要盘问的NPC和关键词。
                 </div>`;
             showModal('📜 搜证', html);
         }
@@ -1311,6 +1351,8 @@
                             🤝 朋友：${state.friendIds.map(id=>CHARACTERS.find(c=>c.id===id)?.name).filter(Boolean).join('、') || '无'}
                             <br>
                             ⬜ NPC已解锁：${unlockedNpc} / ${npcList.length}
+                            <br>
+                            🎯 剩余盘问次数：<strong>${state.maxAskCount - state.askCount}</strong>
                         </p>
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#1a2a1a;border-radius:12px;border:1px solid #3a5a3a;">
@@ -1329,10 +1371,19 @@
                 addLog(`⚠️ 关键词「${keyword}」已使用`, 'system');
                 return;
             }
+            if (state.askCount >= state.maxAskCount) {
+                alert('你的盘问次数已用完！');
+                return;
+            }
+
             const result = tryUnlockNPC(keyword, target);
             if (!result) {
                 addLog(`❓ 盘问 [${keyword}] 无匹配`, 'system');
                 document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
+                return;
+            }
+            if (result.type === 'no_ask') {
+                alert(result.msg);
                 return;
             }
             if (result.type === 'my' || result.type === 'friend' || result.type === 'wrong' || result.type === 'already' ||
@@ -1343,18 +1394,20 @@
             }
             if (result.type === 'layer') {
                 const char = CHARACTERS.find(c => c.id === result.charId);
-                addLog(`🔓 NPC ${char.name} 的第${result.layer}层已解锁！`, 'player');
+                const remaining = state.maxAskCount - state.askCount;
+                addLog(`🔓 ${char.name} 的第${result.layer}层已解锁！(剩余${remaining}次)`, 'player');
                 addRelation(result.charId);
                 const layerName = result.layer === 2 ? '深层秘密' : '完整故事';
                 showModal(`🔓 ${char.name} · ${layerName}`, `
                         <div style="color:#f0d5c0;white-space:pre-wrap;line-height:1.8;">${result.text}</div>
                         <div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                            💡 这是NPC的${layerName}。你可以在连麦中决定是否分享。
+                            💡 剩余盘问次数：<strong>${remaining}</strong>
                         </div>
                     `);
                 if (result.layer === 2) {
                     setTimeout(() => triggerNpcStory(), 500);
                 }
+                updateAskCounter();
             }
             renderKeywords();
             renderTargets();
@@ -1364,10 +1417,14 @@
             renderMySecret();
             renderRelation();
             updateUI();
+
             const npcList = getNPCList();
             const allNpcL2 = npcList.every(c => getUnlockedLayers(c.id).includes(2));
             if (allNpcL2) {
                 addLog('💡 所有NPC的第2层已解锁！可以开始投票了。', 'system');
+            }
+            if (state.askCount >= state.maxAskCount) {
+                addLog('⛔ 你的盘问次数已用完！推进剧情进入投票阶段。', 'system');
             }
         }
 
@@ -1459,8 +1516,9 @@
             } else if (state.sceneIndex >= 2) {
                 phaseTip.innerHTML = `<strong>🗳️ 投票阶段</strong><br>根据你掌握的所有线索，投票选出你认为的凶手。`;
             } else {
+                const remaining = state.maxAskCount - state.askCount;
                 phaseTip.innerHTML =
-                    `<strong>✅ 你的完整故事已解锁</strong><br>仔细阅读你的全部故事。盘问NPC获取碎片线索，然后投票找出凶手。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
+                    `<strong>✅ 你的完整故事已解锁</strong><br>仔细阅读你的全部故事。你有 <strong>${remaining}次盘问机会</strong>。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
             }
         }
 
@@ -1541,6 +1599,8 @@
             });
             stepSelect.classList.add('hidden');
             gamePanel.classList.remove('hidden');
+            state.askCount = 0;
+            updateAskCounter();
             renderMySecret();
             renderFriendList();
             renderRoleStatus();
@@ -1551,7 +1611,7 @@
             updateUI();
             const my = getMyChar();
             addLog(`🌙 你已扮演 ${my.name}，全部故事已解锁`, 'player');
-            addLog(`📖 请仔细阅读你的完整故事，然后盘问NPC获取更多线索`, 'player');
+            addLog(`🎯 你有 ${state.maxAskCount}次盘问机会，请谨慎使用`, 'player');
             setTimeout(() => triggerNpcStory(), 500);
         }
 
@@ -1568,6 +1628,7 @@
             state.voteTarget = null;
             state.hasVoted = false;
             state.truthRevealed = false;
+            state.askCount = 0;
             gamePanel.classList.add('hidden');
             stepSelect.classList.remove('hidden');
             renderCharSelection();
@@ -1584,6 +1645,7 @@
             revealTruthBtn.disabled = false;
             submitVoteBtn.textContent = '✅ 确认投票';
             submitVoteBtn.disabled = false;
+            updateAskCounter();
             renderRelation();
             updateUI();
             playerNameDisplay.textContent = '👤 未选角色';
@@ -1600,9 +1662,10 @@
                 renderTargets();
                 renderRelation();
                 renderVote();
+                updateAskCounter();
                 updateUI();
-                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》最终统一版', 'system');
-                addLog('📖 选角后你的全部故事直接解锁，盘问NPC获取线索，然后投票', 'system');
+                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》2次盘问版', 'system');
+                addLog('🎯 每人有2次盘问机会，请谨慎选择', 'system');
 
                 confirmBtn.addEventListener('click', confirmMyRole);
                 markFriendBtn.addEventListener('click', markFriend);
