@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>夜明珠 · 戏楼诡影</title>
+    <title>夜明珠 · 戏楼诡影 · 无限制版</title>
     <style>
         * {
             box-sizing: border-box;
@@ -531,23 +531,6 @@
             background: #4a6a4a;
             border-color: #7aaa7a;
         }
-        .ask-counter {
-            display: inline-block;
-            background: #1a1a2a;
-            border: 1px solid #4a4a6a;
-            border-radius: 40px;
-            padding: 4px 18px;
-            font-size: 0.8rem;
-            color: #c0c0e0;
-        }
-        .ask-counter .num {
-            color: #f7d9c0;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .ask-counter .num.zero {
-            color: #d04a4a;
-        }
     </style>
 </head>
 <body>
@@ -556,8 +539,8 @@
         <h1>🌙 夜明珠 · 戏楼诡影</h1>
         <div class="subhead">
             <span>🎭 民国 · 1943</span>
-            <span>🗳️ 2次盘问版</span>
-            <span>⚡ 投票后揭晓真相</span>
+            <span>🗳️ 无限制版</span>
+            <span>⚡ 随时投票</span>
         </div>
 
         <div class="flex-between">
@@ -590,7 +573,7 @@
 
             <div class="phase-tip" id="phaseTip">
                 <strong>📖 你的全部故事已解锁</strong><br>
-                仔细阅读你的完整故事。你有 <strong>2次盘问机会</strong>，选择要盘问的NPC和关键词。
+                盘问NPC获取更多碎片线索，然后投票找出凶手。
             </div>
 
             <div class="flex-row">
@@ -641,9 +624,6 @@
                     <span style="font-size:0.85rem;">🔍 盘问NPC · 选对象 + <strong>1个关键词</strong></span>
                     <span class="text-muted" id="askHint">解锁NPC碎片故事</span>
                 </div>
-                <div style="text-align:center; margin-bottom:8px;">
-                    <span class="ask-counter">🎯 剩余盘问次数：<span class="num" id="askCounterNum">2</span></span>
-                </div>
                 <div class="flex-row" style="justify-content:flex-start; gap:5px; flex-wrap:wrap;" id="targetSelector"></div>
                 <div style="margin: 6px 0;">
                     <span style="font-size:0.7rem; color:#b6967e;">关键词池：</span>
@@ -655,7 +635,7 @@
                 </div>
             </div>
 
-            <!-- 投票区 -->
+            <!-- 投票区（始终可见） -->
             <div class="card" id="voteSection">
                 <div class="card-title">
                     <span>🗳️ 投票凶手</span>
@@ -854,8 +834,6 @@
             voteTarget: null,
             hasVoted: false,
             truthRevealed: false,
-            askCount: 0,
-            maxAskCount: 2,
         };
 
         // ================================================================
@@ -902,7 +880,6 @@
         const voteBtn = $('voteBtn');
         const truthContent = $('truthContent');
         const revealTruthBtn = $('revealTruthBtn');
-        const askCounterNum = $('askCounterNum');
 
         function getMyChar() { return CHARACTERS.find(c => c.id === state.myRoleId); }
 
@@ -917,19 +894,6 @@
         function isNPC(id) { return !isMyChar(id) && !isFriend(id); }
 
         function getNPCList() { return CHARACTERS.filter(c => isNPC(c.id)); }
-
-        function updateAskCounter() {
-            const remaining = state.maxAskCount - state.askCount;
-            askCounterNum.textContent = remaining;
-            askCounterNum.className = 'num' + (remaining <= 0 ? ' zero' : '');
-            if (remaining <= 0) {
-                askBtn.disabled = true;
-                askBtn.textContent = '⛔ 次数已用完';
-            } else {
-                askBtn.disabled = false;
-                askBtn.textContent = '⚡ 盘问NPC';
-            }
-        }
 
         function addLog(msg, type = 'system', isNpc = false) {
             state.log.unshift({ msg, type, time: new Date().toLocaleTimeString(), isNpc });
@@ -989,12 +953,7 @@
         }
 
         function renderKeywords() {
-            const targetableIds = getNPCList().map(c => c.id);
-            const relevantKeywords = KEYWORDS.filter(kw => {
-                const mapping = KEYWORD_MAP[kw];
-                return targetableIds.includes(mapping.targetId);
-            });
-            keywordPool.innerHTML = relevantKeywords.map(kw => {
+            keywordPool.innerHTML = KEYWORDS.map(kw => {
                 const used = state.keywordsUsed.includes(kw);
                 return `<span class="keyword-tag ${used?'used':''}" data-keyword="${kw}">${kw}</span>`;
             }).join('');
@@ -1036,9 +995,6 @@
         }
 
         function tryUnlockNPC(keyword, targetId) {
-            if (state.askCount >= state.maxAskCount) {
-                return { type: 'no_ask', msg: '你的盘问次数已用完！' };
-            }
             if (!keyword || state.keywordsUsed.includes(keyword)) return null;
             if (isMyChar(targetId)) return { type: 'my', msg: '这是你自己的角色，已全部解锁' };
             if (isFriend(targetId)) return { type: 'friend', msg: '这是朋友角色，故事由朋友口述' };
@@ -1060,7 +1016,6 @@
                 if (!state.unlockedLayers[targetId]) state.unlockedLayers[targetId] = [];
                 state.unlockedLayers[targetId].push(nextLayer);
                 state.keywordsUsed.push(keyword);
-                state.askCount++;
                 let layerText = '';
                 if (nextLayer === 2) layerText = char.layer2;
                 else if (nextLayer === 3) layerText = char.layer3;
@@ -1325,7 +1280,7 @@
                     `;
             });
             html += `<div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                    💡 搜证完成。你有 <strong>2次盘问机会</strong>，选择要盘问的NPC和关键词。
+                    💡 搜证完成。随时可以投票，无需解锁所有NPC。
                 </div>`;
             showModal('📜 搜证', html);
         }
@@ -1351,8 +1306,6 @@
                             🤝 朋友：${state.friendIds.map(id=>CHARACTERS.find(c=>c.id===id)?.name).filter(Boolean).join('、') || '无'}
                             <br>
                             ⬜ NPC已解锁：${unlockedNpc} / ${npcList.length}
-                            <br>
-                            🎯 剩余盘问次数：<strong>${state.maxAskCount - state.askCount}</strong>
                         </p>
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#1a2a1a;border-radius:12px;border:1px solid #3a5a3a;">
@@ -1371,19 +1324,11 @@
                 addLog(`⚠️ 关键词「${keyword}」已使用`, 'system');
                 return;
             }
-            if (state.askCount >= state.maxAskCount) {
-                alert('你的盘问次数已用完！');
-                return;
-            }
 
             const result = tryUnlockNPC(keyword, target);
             if (!result) {
                 addLog(`❓ 盘问 [${keyword}] 无匹配`, 'system');
                 document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)?.classList.remove('active');
-                return;
-            }
-            if (result.type === 'no_ask') {
-                alert(result.msg);
                 return;
             }
             if (result.type === 'my' || result.type === 'friend' || result.type === 'wrong' || result.type === 'already' ||
@@ -1394,20 +1339,18 @@
             }
             if (result.type === 'layer') {
                 const char = CHARACTERS.find(c => c.id === result.charId);
-                const remaining = state.maxAskCount - state.askCount;
-                addLog(`🔓 ${char.name} 的第${result.layer}层已解锁！(剩余${remaining}次)`, 'player');
+                addLog(`🔓 ${char.name} 的第${result.layer}层已解锁！`, 'player');
                 addRelation(result.charId);
                 const layerName = result.layer === 2 ? '深层秘密' : '完整故事';
                 showModal(`🔓 ${char.name} · ${layerName}`, `
                         <div style="color:#f0d5c0;white-space:pre-wrap;line-height:1.8;">${result.text}</div>
                         <div style="margin-top:10px;padding:10px;background:#0d080a;border-radius:12px;color:#b6967e;font-size:0.8rem;">
-                            💡 剩余盘问次数：<strong>${remaining}</strong>
+                            💡 这是NPC的${layerName}。你可以在连麦中决定是否分享。
                         </div>
                     `);
                 if (result.layer === 2) {
                     setTimeout(() => triggerNpcStory(), 500);
                 }
-                updateAskCounter();
             }
             renderKeywords();
             renderTargets();
@@ -1417,15 +1360,6 @@
             renderMySecret();
             renderRelation();
             updateUI();
-
-            const npcList = getNPCList();
-            const allNpcL2 = npcList.every(c => getUnlockedLayers(c.id).includes(2));
-            if (allNpcL2) {
-                addLog('💡 所有NPC的第2层已解锁！可以开始投票了。', 'system');
-            }
-            if (state.askCount >= state.maxAskCount) {
-                addLog('⛔ 你的盘问次数已用完！推进剧情进入投票阶段。', 'system');
-            }
         }
 
         function markFriend() {
@@ -1476,59 +1410,24 @@
             sceneTitle.textContent = scene.title;
             sceneDesc.textContent = scene.desc;
             scenePhase.textContent = `第${state.sceneIndex+1}幕`;
-            if (state.truthRevealed) {
-                phaseBadge.textContent = '🕯️ 真相已揭晓';
-                phaseBadge.className = 'phase-badge truth';
-            } else if (state.hasVoted) {
-                phaseBadge.textContent = '🗳️ 已投票';
-                phaseBadge.className = 'phase-badge vote';
-            } else if (state.sceneIndex >= 2) {
-                phaseBadge.textContent = '🗳️ 投票阶段';
-                phaseBadge.className = 'phase-badge vote';
-            } else {
-                phaseBadge.textContent = '📌 搜证阶段';
-                phaseBadge.className = 'phase-badge';
-            }
-            if (state.sceneIndex >= 2) {
-                document.getElementById('voteSection').classList.remove('hidden');
-            } else {
-                document.getElementById('voteSection').classList.add('hidden');
-            }
-            if (state.truthRevealed || state.hasVoted) {
-                document.getElementById('truthSection').classList.remove('hidden');
-            } else {
-                document.getElementById('truthSection').classList.add('hidden');
-            }
+
+            const phaseNames = ['📌 搜证', '🔍 盘问', '💬 分享', '🎬 结局'];
+            phaseBadge.textContent = phaseNames[Math.min(state.sceneIndex, 3)];
+
             if (state.sceneIndex >= 2) endingSection.classList.remove('hidden');
             else endingSection.classList.add('hidden');
             nextSceneBtn.textContent = state.sceneIndex >= 2 ? '🔄 重演真相' : '▶ 推进剧情';
+
             const my = getMyChar();
             const npcList = getNPCList();
             const unlockedNpc = npcList.filter(c => getUnlockedLayers(c.id).length > 0).length;
-            if (!my) {
-                phaseTip.innerHTML =
-                `<strong>📖 请先选择你的角色</strong><br>点击角色头像选择，然后点击「确认我的角色」开始游戏。`;
-            } else if (state.truthRevealed) {
-                phaseTip.innerHTML = `<strong>🕯️ 真相已揭晓</strong><br>查看完整真相，然后选择结局。`;
-            } else if (state.hasVoted) {
-                phaseTip.innerHTML =
-                    `<strong>🗳️ 你已投票</strong><br>点击「揭晓真相」查看完整故事和凶手真相。`;
-            } else if (state.sceneIndex >= 2) {
-                phaseTip.innerHTML = `<strong>🗳️ 投票阶段</strong><br>根据你掌握的所有线索，投票选出你认为的凶手。`;
-            } else {
-                const remaining = state.maxAskCount - state.askCount;
-                phaseTip.innerHTML =
-                    `<strong>✅ 你的完整故事已解锁</strong><br>仔细阅读你的全部故事。你有 <strong>${remaining}次盘问机会</strong>。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
-            }
-        }
 
-        function checkSceneProgress() {
-            const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
-            const s = state.sceneIndex;
-            if (s === 0 && totalLayers >= 2) return true;
-            if (s === 1 && totalLayers >= 6) return true;
-            if (s === 2) return true;
-            return false;
+            if (!my) {
+                phaseTip.innerHTML = `<strong>📖 请先选择你的角色</strong><br>点击角色头像选择，然后点击「确认我的角色」开始游戏。`;
+            } else {
+                phaseTip.innerHTML =
+                    `<strong>✅ 你的完整故事已解锁</strong><br>盘问NPC获取更多线索，然后直接投票。无需解锁所有NPC。NPC已解锁 ${unlockedNpc}/${npcList.length}。`;
+            }
         }
 
         function showModal(title, body) {
@@ -1538,18 +1437,15 @@
         }
 
         function nextScene() {
-            const totalLayers = CHARACTERS.reduce((sum, c) => sum + getUnlockedLayers(c.id).length, 0);
+            // 无限制，直接推进
             if (state.sceneIndex < 2) {
-                if (!checkSceneProgress()) {
-                    alert(`需要更多NPC解锁 (当前 ${totalLayers}层 / 需要 ${state.sceneIndex===0?2:6}层)`);
-                    return;
-                }
                 state.sceneIndex++;
                 state.npcStoryIndex = 0;
                 addLog(`📌 进入 ${SCENES[state.sceneIndex].title}`, 'system');
                 setTimeout(() => triggerNpcStory(), 300);
                 if (state.sceneIndex === 2) {
                     addLog('🗳️ 进入投票阶段！选出你心中的凶手。', 'system');
+                    endingSection.classList.remove('hidden');
                 }
                 updateUI();
                 renderRelation();
@@ -1599,8 +1495,6 @@
             });
             stepSelect.classList.add('hidden');
             gamePanel.classList.remove('hidden');
-            state.askCount = 0;
-            updateAskCounter();
             renderMySecret();
             renderFriendList();
             renderRoleStatus();
@@ -1611,7 +1505,7 @@
             updateUI();
             const my = getMyChar();
             addLog(`🌙 你已扮演 ${my.name}，全部故事已解锁`, 'player');
-            addLog(`🎯 你有 ${state.maxAskCount}次盘问机会，请谨慎使用`, 'player');
+            addLog(`🗳️ 随时可以投票，无需解锁所有NPC`, 'player');
             setTimeout(() => triggerNpcStory(), 500);
         }
 
@@ -1628,7 +1522,6 @@
             state.voteTarget = null;
             state.hasVoted = false;
             state.truthRevealed = false;
-            state.askCount = 0;
             gamePanel.classList.add('hidden');
             stepSelect.classList.remove('hidden');
             renderCharSelection();
@@ -1636,7 +1529,6 @@
             endingResetBtn.disabled = false;
             endingButterflyBtn.disabled = false;
             endingSection.classList.add('hidden');
-            document.getElementById('voteSection').classList.add('hidden');
             document.getElementById('truthSection').classList.add('hidden');
             logArea.innerHTML = '';
             npcSpeechContainer.innerHTML = '';
@@ -1645,7 +1537,6 @@
             revealTruthBtn.disabled = false;
             submitVoteBtn.textContent = '✅ 确认投票';
             submitVoteBtn.disabled = false;
-            updateAskCounter();
             renderRelation();
             updateUI();
             playerNameDisplay.textContent = '👤 未选角色';
@@ -1662,10 +1553,9 @@
                 renderTargets();
                 renderRelation();
                 renderVote();
-                updateAskCounter();
                 updateUI();
-                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》2次盘问版', 'system');
-                addLog('🎯 每人有2次盘问机会，请谨慎选择', 'system');
+                addLog('🌙 欢迎来到《夜明珠·戏楼诡影》无限制版', 'system');
+                addLog('🗳️ 随时可以投票，无需解锁所有NPC', 'system');
 
                 confirmBtn.addEventListener('click', confirmMyRole);
                 markFriendBtn.addEventListener('click', markFriend);
